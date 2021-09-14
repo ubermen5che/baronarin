@@ -1,0 +1,44 @@
+=============== Aug 2, 2021 (KST) ===============
+15:58:36.828067 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:58:36.834898 db@open opening
+15:58:36.836993 version@stat F·[] S·0B[] Sc·[]
+15:58:36.838138 db@janitor F·2 G·0
+15:58:36.838165 db@open done T·3.22701ms
+16:29:43.559005 db@close closing
+16:29:43.559306 db@close done T·301.532µs
+=============== Aug 2, 2021 (KST) ===============
+16:30:08.823965 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:30:08.824603 version@stat F·[] S·0B[] Sc·[]
+16:30:08.824615 db@open opening
+16:30:08.824634 journal@recovery F·1
+16:30:08.825657 journal@recovery recovering @1
+16:30:08.828689 memdb@flush created L0@2 N·2 S·176B "loc..seq,v2":"version,v1"
+16:30:08.830071 version@stat F·[1] S·176B[176B] Sc·[0.25]
+16:30:08.836282 db@janitor F·3 G·0
+16:30:08.836297 db@open done T·11.678407ms
+=============== Aug 3, 2021 (KST) ===============
+09:11:45.161789 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+09:11:45.170938 version@stat F·[1] S·176B[176B] Sc·[0.25]
+09:11:45.171032 db@open opening
+09:11:45.171118 journal@recovery F·1
+09:11:45.175439 journal@recovery recovering @3
+09:11:45.187556 memdb@flush created L0@5 N·1 S·159B "loc..seq,v4":"loc..seq,v4"
+09:11:45.189010 version@stat F·[2] S·335B[335B] Sc·[0.50]
+09:11:45.236040 db@janitor F·4 G·0
+09:11:45.236057 db@open done T·65.016153ms
+=============== Aug 4, 2021 (KST) ===============
+09:25:15.040020 db@close closing
+09:25:15.042050 db@close done T·2.028209ms
+=============== Aug 4, 2021 (KST) ===============
+09:25:48.117243 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+09:25:48.123948 version@stat F·[2] S·335B[335B] Sc·[0.50]
+09:25:48.124004 db@open opening
+09:25:48.124098 journal@recovery F·1
+09:25:48.126442 journal@recovery recovering @6
+09:25:48.130487 memdb@flush created L0@8 N·1 S·159B "loc..seq,v6":"loc..seq,v6"
+09:25:48.132478 version@stat F·[3] S·494B[494B] Sc·[0.75]
+09:25:48.160616 db@janitor F·5 G·0
+09:25:48.160632 db@open done T·36.620808ms
+=============== Aug 5, 2021 (KST) ===============
+10:46:08.934730 db@close closing
+10:46:08.935124 db@close done T·392.781µs

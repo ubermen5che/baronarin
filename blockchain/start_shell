@@ -1,0 +1,11 @@
+#!/bin/bash
+
+sudo gnome-terminal --command "sudo geth --networkid 1004 --datadir test1 -nodiscover --port 30303 --rpc --rpcport \"8545\" --rpcaddr \"0.0.0.0\" --rpccorsdomain \"*\" --rpcapi \"eth, net, web3, miner, debug, personal, rpc\" console --allow-insecure-unlock"
+
+sudo gnome-terminal --command "sudo geth --networkid 1004 --datadir test2 -nodiscover --port 30304 --rpc --rpcport \"8546\" --rpcaddr \"0.0.0.0\" --rpccorsdomain \"*\" --rpcapi \"eth, net, web3, miner, debug, personal, rpc\" console --allow-insecure-unlock"
+
+sudo gnome-terminal --command "sudo geth --networkid 1004 --datadir test3 -nodiscover --port 30305 --rpc --rpcport \"8547\" --rpcaddr \"0.0.0.0\" --rpccorsdomain \"*\" --rpcapi \"eth, net, web3, miner, debug, personal, rpc\" console --allow-insecure-unlock"
+
+sudo gnome-terminal --command "sudo node index.js"
+
+firefox "localhost:4000/start"

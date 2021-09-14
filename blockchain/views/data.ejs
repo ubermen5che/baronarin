@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/js/style.css" type="text/css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="mt-3 mb-4">Vane_BlockChain</h1>
+    
+    <div>
+      계정:
+      <input type="hidden" id="account" value="0x39bD2d7C8563771aF0C2B0B74177f4F226B5Decf" placeholder="주소를 입력해주세요" />
+      <p></p>
+    </div>
+    <br />
+    
+    <div>
+   
+      <input type="hidden" id="uniquenum" placeholder="일련번호" value="<%= block[0]%>"/> 
+      <input type="hidden" id="papername" placeholder="계약서 이름" value="<%= block[1]%>"/>
+      <input type="hidden" id="people_size" placeholder="서명 필요 인원" value="<%= block[2]%>"/>
+   
+      <input type="hidden" id="sign_count" placeholder="서명 완료 인원" value="<%= block[3]%>" />
+      <input type="hidden" id="orig_name" placeholder="실제 파일 이름" value="<%= block[4]%>"/>
+      <input type="hidden" id="ser_fileName" placeholder="저장 파일 이름" value="<%= block[5]%>"/>
+	
+     <input type="hidden" id="people1_email" placeholder="인원1 이메일" value="<%= block2[0]%>"/>
+      <input type="hidden" id="people1_time" placeholder="인원1 시간" value="<%= block2[1]%>"/>
+   
+      <input type="hidden" id="people2_email" placeholder="인원2 이메일" value="<%= block2[2]%>" />
+      <input type="hidden" id="people2_time" placeholder="인원2 시간" value="<%= block2[3]%>"/>
+      <input type="hidden" id="people3_email" placeholder="인원3 이메일" value="<%= block2[4]%>"/>
+      <input type="hidden" id="people3_time" placeholder="인원3 시간" value="<%= block2[5]%>"/>
+      <input type="hidden" id="result_hash" placeholder="해시값" value="<%= block2[6]%>"/>
+	
+      <button id="register" onClick="addProduct1()">등록하기</button>
+      <button id="register2" onClick="addProduct2()">등록하기2</button>
+      
+      
+    </div>
+    <table style="width:100%" id="table1"><br><br><th style="color:red">Index</th><th>&nbsp일련번호</th><th>계약서 이름</th><th>서명 필요 인원 수</th><th>서명 완료 인원 수</th><th>파일 이름</th><th>토큰 생성 시간</th>
+    </table>
+        <table style="width:100%" id="table2"><th style="color:red">Index</th><th>&nbsp이메일1</th><th>서명시간1</th><th>이메일2</th><th>서명시간2</th><th>이메일3</th><th>서명시간3</th><th>계약서 해시값</th></table>
+  </div>
+<script>setTimeout(function() {document.getElementById("register").click()},6000);
+setTimeout(function() {document.getElementById("register2").click()},8000);
+
+</script>
+
+  <script src="https://code.jquery.com/jquery-3.4.0.min.js"
+    integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/js/lib/web3-light@0.20.6.js"></script>
+  <script type="text/javascript" src="/js/lib/moment.js"></script>
+  <script type="text/javascript" src="/js/lib/moment_locale.js"></script>
+  <script type="text/javascript" src="/js/abi.js"></script>
+  <script type="text/javascript" src="/js/app.js"></script>
+</body>
+
+<script>setTimeout('location.reload()', 10000);</script>
+
+</html>
