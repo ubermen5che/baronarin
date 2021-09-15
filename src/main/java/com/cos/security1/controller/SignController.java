@@ -8,10 +8,11 @@ import com.cos.security1.domain.MessageForm;
 import com.cos.security1.domain.User;
 import com.cos.security1.common.Imagetest;
 import com.cos.security1.repository.*;
+import com.cos.security1.service.FileService;
+import com.cos.security1.service.MailSenderService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,12 @@ public class SignController {
 
     @Autowired
     private CopyrightRepository copyrightRepository;
+
+    @Autowired
+    private FileService fileService;
+
+    @Autowired
+    private MailSenderService mailSenderService;
 
     @PostMapping("/user/sign")
     public String userSign(MessageForm message, String title, Timestamp create_time) throws Exception {
@@ -128,14 +135,14 @@ public class SignController {
             if (signCheck) {
                 //봐야할 파일 주소와 계약서 자료 넘기기
                 Imagetest.makeSignPage(fileService.getUpDownloadDir(), tempArt);
-                customMailSender.gmailSend(tempArt, tempArt.getPeople1_email(), fileService.getUpResultDir() + File.separator + tempArt.getSer_fileName());
+                mailSenderService.gmailSendArticle(tempArt, tempArt.getPeople1_email(), fileService.getUpResultDir() + File.separator + tempArt.getSer_fileName());
                 System.out.println("사인과 이미지 합성완료");
                 if (tempArt.getPeople_size() >= 2) {
-                    customMailSender.gmailSend(tempArt, tempArt.getPeople2_email(), "result" + File.separator + tempArt.getSer_fileName());
+                    mailSenderService.gmailSendArticle(tempArt, tempArt.getPeople2_email(), "result" + File.separator + tempArt.getSer_fileName());
                 }
 
                 if (tempArt.getPeople_size() == 3) {
-                    customMailSender.gmailSend(tempArt, tempArt.getPeople3_email(), "result" + File.separator + tempArt.getSer_fileName());
+                    mailSenderService.gmailSendArticle(tempArt, tempArt.getPeople3_email(), "result" + File.separator + tempArt.getSer_fileName());
                 }
 
 
@@ -156,8 +163,6 @@ public class SignController {
 
                 System.out.println("해쉬값 : " + tempArt.getResult_hash());
                 articleRepository.save(tempArt);
-
-
             }
 
         }
@@ -194,9 +199,9 @@ public class SignController {
         savedArticle.setFile_size(file.getSize());
         savedArticle.setOrig_name(file.getOriginalFilename());
         //서버에 저장된 파일이름 저장
-        savedArticle.setSer_fileName(fileServiceImpl.fileUpload(file, null));
+        savedArticle.setSer_fileName(fileService.fileUpload(file, null));
         //경로저장
-        savedArticle.setFile_path(fileServiceImpl.getUpDownloadDir()+File.separator+savedArticle.getSer_fileName());
+        savedArticle.setFile_path(fileService.getUpDownloadDir()+File.separator+savedArticle.getSer_fileName());
 
         articleRepository.save(savedArticle);
 
@@ -241,16 +246,16 @@ public class SignController {
 
         if(isValidUser)
         {
-            mailSenderServiceImpl.gmailSend(savedArticle,savedArticle.getPeople1_email(),null);
+            mailSenderService.gmailSendArticle(savedArticle,savedArticle.getPeople1_email(),null);
 
             if(savedArticle.getPeople_size()>=2)
             {
-                mailSenderServiceImpl.gmailSend(savedArticle,savedArticle.getPeople2_email(),null);
+                mailSenderService.gmailSendArticle(savedArticle,savedArticle.getPeople2_email(),null);
             }
 
             if(savedArticle.getPeople_size()==3)
             {
-                mailSenderServiceImpl.gmailSend(savedArticle,savedArticle.getPeople3_email(),null);
+                mailSenderService.gmailSendArticle(savedArticle,savedArticle.getPeople3_email(),null);
             }
             articleRepository.save(savedArticle);
         }
@@ -271,40 +276,40 @@ public class SignController {
     public String makeSign2(MessageForm message, @RequestParam("uploadFile") MultipartFile file, HttpServletRequest request, RedirectAttributes redirectAttributes) throws Exception
     {
         //db저장
-        Copyright savedArticle = message.toCopyright();
+        Copyright savedCopyright = message.toCopyright();
 
         System.out.println("첫번째 사인 좌표 x : "+message.getPer1()[0]+", y : "+message.getPer1()[1]);
 
         if(message.getPer1()!=null && message.getPer1().length==2)
         {
-            savedArticle.setSign1_xpos(Integer.parseInt( message.getPer1()[0].replaceAll("[^0-9]", "")));
-            savedArticle.setSign1_ypos(Integer.parseInt( message.getPer1()[1].replaceAll("[^0-9]", "")));
+            savedCopyright.setSign1_xpos(Integer.parseInt( message.getPer1()[0].replaceAll("[^0-9]", "")));
+            savedCopyright.setSign1_ypos(Integer.parseInt( message.getPer1()[1].replaceAll("[^0-9]", "")));
         }
 
-        savedArticle.setSign_count(0);
-        savedArticle.setPlain_text("계약서 원문");
-        savedArticle.setFile_size(file.getSize());
-        savedArticle.setOrig_name(file.getOriginalFilename());
+        savedCopyright.setSign_count(0);
+        savedCopyright.setPlain_text("계약서 원문");
+        savedCopyright.setFile_size(file.getSize());
+        savedCopyright.setOrig_name(file.getOriginalFilename());
         //서버에 저장된 파일이름 저장
-        savedArticle.setSer_fileName(fileServiceImpl.fileUpload(file, null));
+        savedCopyright.setSer_fileName(fileService.fileUpload(file, null));
         //경로저장
-        savedArticle.setFile_path(fileServiceImpl.getUpDownloadDir()+File.separator+savedArticle.getSer_fileName());
+        savedCopyright.setFile_path(fileService.getUpDownloadDir()+File.separator+savedCopyright.getSer_fileName());
 
-        User user = userRepository.findByUsername(savedArticle.getPeople1_email());
+        User user = userRepository.findByUsername(savedCopyright.getPeople1_email());
         if(user!=null)
         {
-            savedArticle.setPeople1_signname(user.getSignname());
+            savedCopyright.setPeople1_signname(user.getSignname());
         }
-        copyrightRepository.save(savedArticle);
+        copyrightRepository.save(savedCopyright);
         //System.out.println("계약서 생성 시간1 : "+savedArticle.getCreateDate().toString() );
 
-        savedArticle.setUniquenum(savedArticle.getCreateDate().toString().replaceAll("[^0-9]", ""));
+        savedCopyright.setUniquenum(savedCopyright.getCreateDate().toString().replaceAll("[^0-9]", ""));
         //id_계약서이름으로 계약서 이름 지정
-        String tempString = savedArticle.getPapername();
-        savedArticle.setPapername(savedArticle.getId().toString()+"_"+tempString);
+        String tempString = savedCopyright.getPapername();
+        savedCopyright.setPapername(savedCopyright.getId().toString()+"_"+tempString);
 
-        customMailSender2.gmailSend(savedArticle,savedArticle.getPeople1_email(),null);
-        copyrightRepository.save(savedArticle);
+        mailSenderService.gmailSendCopyright(savedCopyright,savedCopyright.getPeople1_email(),null);
+        copyrightRepository.save(savedCopyright);
 
         return "redirect:/";//홈페이지로 보냄
     }
@@ -325,7 +330,7 @@ public class SignController {
         if (tempUser != null ) {
             System.out.println("서명파일 : " + tempUser.getSignname());
             if (tempUser.getSignname() != null) {
-                File deleteFile = new File(fileServiceImpl.getUpDownloadDir() + File.separator + "userSign" + File.separator + principal.getSignname());
+                File deleteFile = new File(fileService.getUpDownloadDir() + File.separator + "userSign" + File.separator + principal.getSignname());
 
                 if(deleteFile.delete())
                 {
@@ -334,7 +339,7 @@ public class SignController {
                 }
             }
 
-            fileServiceImpl.fileUpload(file, principal.getUsername()+"_sign.png");//tempUser.getSignname());
+            fileService.fileUpload(file, principal.getUsername()+"_sign.png");//tempUser.getSignname());
 
             //article db도 변경시켜야함
             if(tempArt!=null && tempArt.getCreateDate().toString().equals(create_time.toString()))
@@ -378,7 +383,7 @@ public class SignController {
         if (tempUser != null ) {
             System.out.println("서명파일 : " + tempUser.getSignname());
             if (tempUser.getSignname() != null) {
-                File deleteFile = new File(fileServiceImpl.getUpDownloadDir() + File.separator + "userSign" + File.separator + principal.getSignname());
+                File deleteFile = new File(fileService.getUpDownloadDir() + File.separator + "userSign" + File.separator + principal.getSignname());
 
                 if(deleteFile.delete())
                 {
@@ -386,7 +391,7 @@ public class SignController {
                 }
             }
 
-            fileServiceImpl.fileUpload(file, principal.getUsername()+"_sign.png");//tempUser.getSignname());
+            fileService.fileUpload(file, principal.getUsername()+"_sign.png");//tempUser.getSignname());
 
             //article db도 변경시켜야함
             if(tempArt!=null && tempArt.getCreateDate().toString().equals(create_time.toString()))
@@ -425,142 +430,6 @@ public class SignController {
         return -1;
     }
 
-    @PostMapping("/user/sign")
-    public String userSign(MessageForm message, String title, Timestamp create_time ) throws Exception
-    {
-        System.out.println("서명 합성하기");
-        //유저 정보 가져오기
-        UserDetailsImpl principal= (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Article tempArt = articleRepository.findByPapername(title);
-
-
-        if(tempArt!=null && tempArt.getCreateDate().toString().equals(create_time.toString()))//해당 이름의 계약서가 있고, 계약서 생성시기도 일치할 때
-        {
-            System.out.println("계약서 찾음");
-            String sign=null;
-
-            System.out.println("원문 : " +tempArt.getPlain_text());
-
-
-            SimpleDateFormat format1 = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
-            Date time = new Date();
-            String time1 = format1.format(time);
-
-            String one="1";
-
-            if(tempArt.getPeople1_name().equals(principal.getRealname()) && tempArt.getPeople1_email().equals(principal.getUsername())  && !one.equals(tempArt.getPeople1_sign()))
-            {
-                sign = UserRsa.sign(tempArt.getPlain_text(), principal.getPrivateKey());
-                tempArt.setPeople1_encrypt(sign);
-                //System.out.println("사인1 : "+sign);
-                System.out.println("사인1확인 결과 : "+ UserRsa.verifySignarue(tempArt.getPlain_text(),sign, principal.getPublicKey()));
-                tempArt.setPeople1_sign("1");
-                tempArt.setSign_count(tempArt.getSign_count()+1);
-                tempArt.setPeople1_time(time1);
-                //articleRepository.deleteById(tempArt.getId());
-                articleRepository.save(tempArt);
-            }
-
-
-            else if(tempArt.getPeople2_name().equals(principal.getRealname()) && tempArt.getPeople2_email().equals(principal.getUsername()) && !one.equals(tempArt.getPeople2_sign()))
-            {
-                sign = UserRsa.sign(tempArt.getPlain_text(), principal.getPrivateKey());
-                tempArt.setPeople2_encrypt(sign);
-                //System.out.println("사인2 : "+sign);
-                System.out.println("사인2확인 결과 : "+ UserRsa.verifySignarue(tempArt.getPlain_text(),sign, principal.getPublicKey()));
-                tempArt.setPeople2_sign("1");
-                tempArt.setSign_count(tempArt.getSign_count()+1);
-                tempArt.setPeople2_time(time1);
-                //articleRepository.deleteById(tempArt.getId());
-                articleRepository.save(tempArt);
-            }
-
-            else if(tempArt.getPeople3_name().equals(principal.getRealname()) && tempArt.getPeople3_email().equals(principal.getUsername()) && !one.equals(tempArt.getPeople3_sign()))
-            {
-                sign = UserRsa.sign(tempArt.getPlain_text(), principal.getPrivateKey());
-                tempArt.setPeople3_encrypt(sign);
-                //System.out.println("사인3 : "+sign);
-                System.out.println("사인3확인 결과 : "+ UserRsa.verifySignarue(tempArt.getPlain_text(),sign, principal.getPublicKey()));
-                tempArt.setPeople3_sign("1");
-                tempArt.setSign_count(tempArt.getSign_count()+1);
-                tempArt.setPeople3_time(time1);
-                //articleRepository.deleteById(tempArt.getId());
-                articleRepository.save(tempArt);
-            }
-
-            //모두가 싸인을 완료했을 때
-            boolean signCheck = false;
-
-            System.out.println("계약 인원수 : "+tempArt.getPeople_size());
-            switch(tempArt.getPeople_size())
-            {
-
-                case 1:
-                    if(one.equals(tempArt.getPeople1_sign()))
-                    {
-                        System.out.println("1인 싸인 완료");
-                        signCheck = true;
-
-                    }
-                    break;
-
-                case 2:
-                    System.out.println("싸인여부 1 : "+tempArt.getPeople1_sign()+"  싸인 여부 2 : "+tempArt.getPeople2_sign());
-                    if(one.equals(tempArt.getPeople1_sign()) && one.equals(tempArt.getPeople2_sign()))
-                    {
-                        System.out.println("2인 싸인 완료");
-                        signCheck = true;
-                    }
-                    break;
-
-                case 3:
-                    if(one.equals(tempArt.getPeople1_sign()) && one.equals(tempArt.getPeople2_sign()) && one.equals(tempArt.getPeople3_sign()))
-                    {
-                        System.out.println("3인 싸인 완료");
-                        signCheck = true;
-                    }
-            }
-
-            if(signCheck)
-            {
-                //봐야할 파일 주소와 계약서 자료 넘기기
-                Imagetest.makeSignPage(fileServiceImpl.getUpDownloadDir(), tempArt);
-                mailSenderServiceImpl.gmailSend(tempArt,tempArt.getPeople1_email(), fileServiceImpl.getUpResultDir()+File.separator+tempArt.getSer_fileName());
-                System.out.println("사인과 이미지 합성완료");
-                if(tempArt.getPeople_size()>=2)
-                {
-                    mailSenderServiceImpl.gmailSend(tempArt,tempArt.getPeople2_email(),"result"+File.separator+tempArt.getSer_fileName());
-                }
-
-                if(tempArt.getPeople_size()==3)
-                {
-                    mailSenderServiceImpl.gmailSend(tempArt,tempArt.getPeople3_email(),"result"+File.separator+tempArt.getSer_fileName());
-                }
-
-                //완료된 계약서 파일 해쉬
-                InputStream imageStream = new FileInputStream(fileServiceImpl.getUpResultDir() +File.separator + tempArt.getSer_fileName());//
-                byte[] imageByteArray = IOUtils.toByteArray(imageStream);
-                imageStream.close();
-
-                MessageDigest md = MessageDigest.getInstance("SHA-256");
-                md.update(imageByteArray);
-
-
-                StringBuilder builder = new StringBuilder();
-                for (byte b: md.digest()) {
-                    builder.append(String.format("%02x", b));
-                }
-                tempArt.setResult_hash(""+builder.toString());
-
-                System.out.println("해쉬값 : "+tempArt.getResult_hash());
-                articleRepository.save(tempArt);
-            }
-
-        }
-        return "redirect:/user/myPage";//홈페이지로 보냄
-    }
-
     @PostMapping("/user/sign2")
     public String userSign2(MessageForm message, String title, Timestamp create_time ) throws Exception
     {
@@ -568,15 +437,15 @@ public class SignController {
         //유저 정보 가져오기
         UserDetailsImpl principal= (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Copyright tempArt = copyrightRepository.findByPapername(title);
+        Copyright searchedCopyright = copyrightRepository.findByPapername(title);
 
 
-        if(tempArt!=null && tempArt.getCreateDate().toString().equals(create_time.toString()))//해당 이름의 계약서가 있고, 계약서 생성시기도 일치할 때
+        if(searchedCopyright!=null && searchedCopyright.getCreateDate().toString().equals(create_time.toString()))//해당 이름의 계약서가 있고, 계약서 생성시기도 일치할 때
         {
             System.out.println("계약서 찾음");
             String sign=null;
 
-            System.out.println("원문 : " +tempArt.getPlain_text());
+            System.out.println("원문 : " +searchedCopyright.getPlain_text());
 
 
             SimpleDateFormat format1 = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
@@ -585,25 +454,25 @@ public class SignController {
 
             String one="1";
 
-            if(tempArt.getPeople1_name().equals(principal.getRealname()) && tempArt.getPeople1_email().equals(principal.getUsername())  && !one.equals(tempArt.getPeople1_sign()))
+            if(searchedCopyright.getPeople1_name().equals(principal.getRealname()) && searchedCopyright.getPeople1_email().equals(principal.getUsername())  && !one.equals(searchedCopyright.getPeople1_sign()))
             {
-                sign = UserRsa.sign(tempArt.getPlain_text(), principal.getPrivateKey());
-                tempArt.setPeople1_encrypt(sign);
+                sign = UserRsa.sign(searchedCopyright.getPlain_text(), principal.getPrivateKey());
+                searchedCopyright.setPeople1_encrypt(sign);
                 //System.out.println("사인1 : "+sign);
-                System.out.println("사인1확인 결과 : "+ UserRsa.verifySignarue(tempArt.getPlain_text(),sign, principal.getPublicKey()));
-                tempArt.setPeople1_sign("1");
-                tempArt.setSign_count(tempArt.getSign_count()+1);
-                tempArt.setPeople1_time(time1);
+                System.out.println("사인1확인 결과 : "+ UserRsa.verifySignarue(searchedCopyright.getPlain_text(),sign, principal.getPublicKey()));
+                searchedCopyright.setPeople1_sign("1");
+                searchedCopyright.setSign_count(searchedCopyright.getSign_count()+1);
+                searchedCopyright.setPeople1_time(time1);
                 //articleRepository.deleteById(tempArt.getId());
-                copyrightRepository.save(tempArt);
+                copyrightRepository.save(searchedCopyright);
             }
 
             //모두가 싸인을 완료했을 때
             boolean signCheck = false;
 
-            System.out.println("계약 인원수 : "+tempArt.getPeople_size());
+            System.out.println("계약 인원수 : "+searchedCopyright.getPeople_size());
 
-            if(one.equals(tempArt.getPeople1_sign()))
+            if(one.equals(searchedCopyright.getPeople1_sign()))
             {
                 System.out.println("1인 싸인 완료");
                 signCheck = true;
@@ -613,12 +482,12 @@ public class SignController {
             if(signCheck)
             {
                 //봐야할 파일 주소와 계약서 자료 넘기기
-                Imagetest.makeSignPage2(fileServiceImpl.getUpDownloadDir(), tempArt);
-                customMailSender2.gmailSend(tempArt,tempArt.getPeople1_email(), fileServiceImpl.getUpResultDir()+File.separator+tempArt.getSer_fileName());
+                Imagetest.makeSignPage2(fileService.getUpDownloadDir(), searchedCopyright);
+                mailSenderService.gmailSendCopyright(searchedCopyright,searchedCopyright.getPeople1_email(), fileService.getUpResultDir()+File.separator+searchedCopyright.getSer_fileName());
                 System.out.println("사인과 이미지 합성완료");
 
                 //완료된 계약서 파일 해쉬
-                InputStream imageStream = new FileInputStream(fileServiceImpl.getUpResultDir() +File.separator + tempArt.getSer_fileName());//
+                InputStream imageStream = new FileInputStream(fileService.getUpResultDir() +File.separator + searchedCopyright.getSer_fileName());//
                 byte[] imageByteArray = IOUtils.toByteArray(imageStream);
                 imageStream.close();
 
@@ -629,10 +498,10 @@ public class SignController {
                 for (byte b: md.digest()) {
                     builder.append(String.format("%02x", b));
                 }
-                tempArt.setResult_hash(""+builder.toString());
+                searchedCopyright.setResult_hash(""+builder.toString());
 
-                System.out.println("해쉬값 : "+tempArt.getResult_hash());
-                copyrightRepository.save(tempArt);
+                System.out.println("해쉬값 : "+searchedCopyright.getResult_hash());
+                copyrightRepository.save(searchedCopyright);
             }
 
         }
@@ -657,7 +526,7 @@ public class SignController {
                 response.setHeader("Content-Disposition",   "attachment;filename=" + encordedFilename + ";filename*= UTF-8''" + encordedFilename);
                 response.setContentType("image/*");
                 //response.setHeader("Content-Disposition", "inline;filename="+tempArt.getSer_fileName());
-                File file = new File(fileServiceImpl.getUpDownloadDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
+                File file = new File(fileService.getUpDownloadDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
                 if(file.exists()) {
                     in = new FileInputStream(file);
                     out = new BufferedOutputStream(response.getOutputStream());
@@ -700,7 +569,7 @@ public class SignController {
                 response.setHeader("Content-Disposition",   "attachment;filename=" + encordedFilename + ";filename*= UTF-8''" + encordedFilename);
                 response.setContentType("image/*");
                 //response.setHeader("Content-Disposition", "inline;filename="+tempArt.getSer_fileName());
-                File file = new File(fileServiceImpl.getUpDownloadDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
+                File file = new File(fileService.getUpDownloadDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
                 if(file.exists()) {
                     in = new FileInputStream(file);
                     out = new BufferedOutputStream(response.getOutputStream());
@@ -745,7 +614,7 @@ public class SignController {
                 response.setHeader("Content-Disposition",   "attachment;filename=" + encordedFilename + ";filename*= UTF-8''" + encordedFilename);
                 response.setContentType("image/*");
                 //response.setHeader("Content-Disposition", "inline;filename="+tempArt.getSer_fileName());
-                File file = new File(fileServiceImpl.getUpResultDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
+                File file = new File(fileService.getUpResultDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
                 if(file.exists()) {
                     in = new FileInputStream(file);
                     out = new BufferedOutputStream(response.getOutputStream());
@@ -788,7 +657,7 @@ public class SignController {
                 response.setHeader("Content-Disposition",   "attachment;filename=" + encordedFilename + ";filename*= UTF-8''" + encordedFilename);
                 response.setContentType("image/*");
                 //response.setHeader("Content-Disposition", "inline;filename="+tempArt.getSer_fileName());
-                File file = new File(fileServiceImpl.getUpResultDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
+                File file = new File(fileService.getUpResultDir()+File.separator+tempArt.getSer_fileName());//upDownloadDir로 바꿀 것
                 if(file.exists()) {
                     in = new FileInputStream(file);
                     out = new BufferedOutputStream(response.getOutputStream());
