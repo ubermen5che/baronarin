@@ -185,26 +185,6 @@ public class IndexController {
 
 		return success;
 	}
-	
-	@ResponseBody
-	@GetMapping("/user/customerComment")
-	public int customerComment(@RequestParam(value="text", required=false) String text,@RequestParam("id") String id, RedirectAttributes redirectAttributes)
-	{
-		int result=0;
-		
-		if(id!=null)
-		{
-			redirectAttributes.addAttribute("admin_comment",text);
-			
-			CostomerCenter customerCenter = costomerCenterRepository.findById(Long.parseLong(id));
-			customerCenter.setAdmincomment(text);
-			costomerCenterRepository.save(customerCenter);
-			System.out.println("text : "+text+"\nid : "+id);
-			result=1;
-		}
-		
-		return result;
-	}
 
 	//자료실
 	@GetMapping("/board")

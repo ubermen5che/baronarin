@@ -249,7 +249,7 @@ public class DocumentController {
                 Resource tempResource =null;
                 try {
                     //서버에 있는 파일 찾기
-                    tempResource = fileServiceImpl.loadFile(tempArt.getSer_fileName());
+                    tempResource = fileService.loadFile(tempArt.getSer_fileName());
                     System.out.println("파일 찾기 성공 : " + tempResource.getFilename());
                 } catch (FileNotFoundException e) {
                     // TODO Auto-generated catch block
@@ -265,7 +265,6 @@ public class DocumentController {
 
                 model.addAttribute("file_serverName", tempArt.getSer_fileName());
                 model.addAttribute("orig_Name", tempArt.getOrig_name());
-                //model.addAttribute("file_serPath", tempArt.getFile_path());
                 model.addAttribute("create_date",tempArt.getCreateDate());
 
                 model.addAttribute("person1_name",tempArt.getPeople1_name());
@@ -278,8 +277,6 @@ public class DocumentController {
 
                 return "user/DocumentcheckPage";
             }
-
-
         }
         //아니라면 홈페이지로 이동
         return "redirect:/";
@@ -333,7 +330,7 @@ public class DocumentController {
                 Resource tempResource =null;
                 try {
                     //서버에 있는 파일 찾기
-                    tempResource = fileServiceImpl.loadFile(tempArt.getSer_fileName());
+                    tempResource = fileService.loadFile(tempArt.getSer_fileName());
                     System.out.println("파일 찾기 성공 : " + tempResource.getFilename());
                 } catch (FileNotFoundException e) {
                     // TODO Auto-generated catch block
@@ -355,7 +352,6 @@ public class DocumentController {
                 model.addAttribute("person1_name",tempArt.getPeople1_name());
 
                 model.addAttribute("person1_issign",tempArt.getPeople1_sign());
-
 
                 return "user/DocumentcheckPage2";
             }

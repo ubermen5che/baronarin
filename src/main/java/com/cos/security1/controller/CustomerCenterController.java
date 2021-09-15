@@ -3,6 +3,7 @@ package com.cos.security1.controller;
 import com.cos.security1.config.auth.UserDetailsImpl;
 import com.cos.security1.domain.CostomerCenter;
 import com.cos.security1.repository.*;
+import com.cos.security1.service.FileService;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,9 @@ public class CustomerCenterController {
 
     @Autowired
     private CustomerCenterRepository costomerCenterRepository;
+
+    @Autowired
+    private FileService fileService;
 
     @PostMapping("/user/customerShowpost")
     public String showPost(@RequestParam("id") String id, Model model)
