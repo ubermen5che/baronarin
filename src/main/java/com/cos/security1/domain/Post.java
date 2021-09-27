@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Data;
@@ -14,6 +16,8 @@ import lombok.Data;
 //자료실
 @Data
 @Entity
+@Getter
+@Setter
 public class Post {
 
 	@Id
@@ -25,9 +29,7 @@ public class Post {
 	
 	@Column
 	private String specificType;
-	
-	
-	
+
 	@CreationTimestamp
 	private Timestamp createDate;
 	
@@ -42,13 +44,10 @@ public class Post {
 
 	@Column
 	private String pdfLink;
+
 	@Column
 	private String hwpLink;
-	
-	
-	
-	
-	
+
 	public Post(String postType, String specificType, String title, String serverpdf, String serverhwp,     String pdfLink, String hwpLink) {
 		super();
 		this.postType = postType;
@@ -59,84 +58,9 @@ public class Post {
 		this.pdfLink = pdfLink;
 		this.hwpLink = hwpLink;
 	}
-	
-	
-	
+
 	public Post()
 	{
 		
 	}
-	
-	
-	
-	
-	
-	public String getServerpdf() {
-		return serverpdf;
-	}
-
-
-
-	public void setServerpdf(String serverpdf) {
-		this.serverpdf = serverpdf;
-	}
-
-
-
-	public String getServerhwp() {
-		return serverhwp;
-	}
-
-
-
-	public void setServerhwp(String serverhwp) {
-		this.serverhwp = serverhwp;
-	}
-
-
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getPostType() {
-		return postType;
-	}
-	public void setPostType(String postType) {
-		this.postType = postType;
-	}
-	public String getSpecificType() {
-		return specificType;
-	}
-	public void setSpecificType(String specificType) {
-		this.specificType = specificType;
-	}
-	public Timestamp getCreateDate() {
-		return createDate;
-	}
-	public void setCreateDate(Timestamp createDate) {
-		this.createDate = createDate;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public String getPdfLink() {
-		return pdfLink;
-	}
-	public void setPdfLink(String pdfLink) {
-		this.pdfLink = pdfLink;
-	}
-	public String getHwpLink() {
-		return hwpLink;
-	}
-	public void setHwpLink(String hwpLink) {
-		this.hwpLink = hwpLink;
-	}
-	
-	
 }
