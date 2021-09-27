@@ -39,16 +39,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.data.domain.Sort;
 
-import com.cos.security1.domain.CostomerCenter;
+import com.cos.security1.domain.CustomerCenter;
 import com.cos.security1.domain.Post;
 import com.cos.security1.service.impl.FileServiceImpl;
 import com.cos.security1.domain.User;
-import com.cos.security1.repository.ArticleRepository;
-import com.cos.security1.repository.CopyrightRepository;
 import com.cos.security1.repository.PostRepository;
 import com.cos.security1.repository.CustomerCenterRepository;
 import com.cos.security1.repository.UserRepository;
-import com.cos.security1.service.impl.MailSenderServiceImpl;
 //import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 
@@ -83,7 +80,7 @@ public class IndexController {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Autowired
-	private CustomerCenterRepository costomerCenterRepository;
+	private CustomerCenterRepository customerCenterRepository;
 
 	@Autowired
     private FileServiceImpl fileServiceImpl;
@@ -122,7 +119,7 @@ public class IndexController {
 	@GetMapping("/customerCenter")
 	public String editSearch(@PageableDefault(size=5, sort="id",direction = Sort.Direction.DESC) Pageable pageable, ModelMap model)
 	{
-		Page<CostomerCenter> pagelist = costomerCenterRepository.findAll(pageable);
+		Page<CustomerCenter> pagelist = customerCenterRepository.findAll(pageable);
 		
 		int pageNumber=pagelist.getPageable().getPageNumber(); //현재페이지
 		int totalPages=pagelist.getTotalPages(); //총 페이지 수. 검색에따라 10개면 10개..
@@ -141,10 +138,10 @@ public class IndexController {
 	@GetMapping(value = "/customerDown/{id}")
     public ResponseEntity<InputStreamResource> getCustomer(@PathVariable("id") String id) throws FileNotFoundException, UnsupportedEncodingException {
 		
-		CostomerCenter costomerCenter = costomerCenterRepository.findById(Long.parseLong(id));
-		System.out.println("파일명 : "+ costomerCenter.getFilename() );
-		 String encordedFilename = URLEncoder.encode(costomerCenter.getFilename(),"UTF-8").replace("+", "%20");
-        String filePath = fileServiceImpl.getUpCustomerCenter() +File.separator +costomerCenter.getServer_filename();
+		CustomerCenter customerCenter = customerCenterRepository.findById(Long.parseLong(id));
+		System.out.println("파일명 : "+ customerCenter.getFilename() );
+		 String encordedFilename = URLEncoder.encode(customerCenter.getFilename(),"UTF-8").replace("+", "%20");
+        String filePath = fileServiceImpl.getUpCustomerCenter() +File.separator + customerCenter.getServer_filename();
         File file = new File(filePath);
         HttpHeaders headers = new HttpHeaders();      
         headers.add("content-disposition", "attachment;filename=" +encordedFilename);
@@ -174,10 +171,10 @@ public class IndexController {
 	public String checkCustomerPass(@RequestParam("id") String id, @RequestParam("pass") String pass)
 	{
 		//System.out.println("id : "+id + " , pass : "+pass);
-		CostomerCenter costomerCenter = costomerCenterRepository.findById(Long.parseLong(id));
+		CustomerCenter customerCenter = customerCenterRepository.findById(Long.parseLong(id));
 		String success="failed";
 
-		if(costomerCenter.getSecretpassword()!=null && costomerCenter.getSecretpassword().equals(pass))
+		if(customerCenter.getSecretpassword()!=null && customerCenter.getSecretpassword().equals(pass))
 		{
 			success="success";
 			return success;

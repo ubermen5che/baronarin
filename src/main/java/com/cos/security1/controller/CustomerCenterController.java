@@ -1,13 +1,12 @@
 package com.cos.security1.controller;
 
 import com.cos.security1.config.auth.UserDetailsImpl;
-import com.cos.security1.domain.CostomerCenter;
+import com.cos.security1.domain.CustomerCenter;
 import com.cos.security1.repository.*;
 import com.cos.security1.service.FileService;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,7 @@ import java.util.UUID;
 public class CustomerCenterController {
 
     @Autowired
-    private CustomerCenterRepository costomerCenterRepository;
+    private CustomerCenterRepository customerCenterRepository;
 
     @Autowired
     private FileService fileService;
@@ -36,23 +35,23 @@ public class CustomerCenterController {
     {
         UserDetailsImpl principal= (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        CostomerCenter costomerCenter = costomerCenterRepository.findById(Long.parseLong(id));
+        CustomerCenter customerCenter = customerCenterRepository.findById(Long.parseLong(id));
 
         //파일 존재할 때
-        if(costomerCenter.getFilename()!=null)
+        if(customerCenter.getFilename()!=null)
         {
-            model.addAttribute("filename",costomerCenter.getFilename());
+            model.addAttribute("filename", customerCenter.getFilename());
         }
         //답변이 있을 시
-        if(costomerCenter.getAdmincomment()!=null)
+        if(customerCenter.getAdmincomment()!=null)
         {
-            model.addAttribute("admin_comment", costomerCenter.getAdmincomment());
+            model.addAttribute("admin_comment", customerCenter.getAdmincomment());
         }
-        model.addAttribute("post_id",costomerCenter.getId());
-        model.addAttribute("create_time",costomerCenter.getCreateDate());
-        model.addAttribute("user_realname", costomerCenter.getRealname());
-        model.addAttribute("title", costomerCenter.getTitle());
-        model.addAttribute("textbody",costomerCenter.getTextbody());
+        model.addAttribute("post_id", customerCenter.getId());
+        model.addAttribute("create_time", customerCenter.getCreateDate());
+        model.addAttribute("user_realname", customerCenter.getRealname());
+        model.addAttribute("title", customerCenter.getTitle());
+        model.addAttribute("textbody", customerCenter.getTextbody());
         return "user/customerShowpost";
     }
 
@@ -63,7 +62,7 @@ public class CustomerCenterController {
 
         if(principal!=null && principal.getRole().equals("ROLE_ADMIN"))
         {
-            CostomerCenter cos = costomerCenterRepository.findById(Long.parseLong(id));
+            CustomerCenter cos = customerCenterRepository.findById(Long.parseLong(id));
 
             if(cos.getServer_filename() != null && cos.getServer_filename().length() >= 1)
             {
@@ -72,7 +71,7 @@ public class CustomerCenterController {
                 System.out.println("게시글 파일 삭제");
             }
             System.out.println("삭제할 게시글 id : "+id);
-            costomerCenterRepository.deleteById(Long.parseLong(id));
+            customerCenterRepository.deleteById(Long.parseLong(id));
             //파일 존재할 때
             System.out.println("게시글 삭제");
         }
@@ -90,9 +89,9 @@ public class CustomerCenterController {
         {
             redirectAttributes.addAttribute("admin_comment",text);
 
-            CostomerCenter customerCenter = costomerCenterRepository.findById(Long.parseLong(id));
+            CustomerCenter customerCenter = customerCenterRepository.findById(Long.parseLong(id));
             customerCenter.setAdmincomment(text);
-            costomerCenterRepository.save(customerCenter);
+            customerCenterRepository.save(customerCenter);
             System.out.println("text : "+text+"\nid : "+id);
             result=1;
         }
@@ -104,7 +103,7 @@ public class CustomerCenterController {
     public String editUpload(Model model, String title, String textbody, String secret, String secretpassword, @RequestParam(value = "uploadfile",required = false) MultipartFile file, String checkfile, RedirectAttributes redirect)
     {
         UserDetailsImpl principal= (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        CostomerCenter query;
+        CustomerCenter query;
         if(checkfile.equals("yes"))
         {
             SimpleDateFormat format1 = new SimpleDateFormat ( "yyyy-MM-dd");
@@ -113,13 +112,13 @@ public class CustomerCenterController {
             String servername = time1 + UUID.randomUUID().toString().replaceAll("-", "");
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 
-            query = new CostomerCenter( title, textbody, principal.getUsername(), principal.getRealname(),null, secret, secretpassword, file.getOriginalFilename(),servername + "."+ extension);
+            query = new CustomerCenter( title, textbody, principal.getUsername(), principal.getRealname(),null, secret, secretpassword, file.getOriginalFilename(),servername + "."+ extension);
             fileService.fileCustomerCenterUpload(file, query.getServer_filename());
         }
         else
-            query = new CostomerCenter( title, textbody, principal.getUsername(),principal.getRealname(), null, secret, secretpassword, null,null);
+            query = new CustomerCenter( title, textbody, principal.getUsername(),principal.getRealname(), null, secret, secretpassword, null,null);
 
-        costomerCenterRepository.save(query);
+        customerCenterRepository.save(query);
 
         System.out.println(query.getId()+"\n"+ title+"\n"+textbody);
 
