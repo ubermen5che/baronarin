@@ -21,6 +21,9 @@ import org.springframework.stereotype.Service;
 
 import com.cos.security1.domain.Article;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Service
 @AllArgsConstructor
 public class MailSenderServiceImpl implements MailSenderService {
@@ -30,7 +33,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 
 	@Override
 	public void gmailSendArticle(Article article, String email, String signedPath) {
-		String user = "ubermen5ch1308@gmail.com"; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
+		String user = ""; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
 		String password = "";   // 패스워드
 		String content;
 
@@ -86,7 +89,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 
 	@Override
 	public void gmailSendCopyright(Copyright copyright, String email, String signedPath){
-		String user = "ubermen5ch1308@gmail.com"; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
+		String user = ""; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
 		String password = "";   // 패스워드
 		String content;
 
@@ -151,6 +154,9 @@ public class MailSenderServiceImpl implements MailSenderService {
 
 	private String buildContForSignArticle(Article article)
 	{
+		LocalDateTime now = LocalDateTime.now().plusMonths(1);
+		String expirationDate = now.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분"));
+
 		String temp= "<!DOCTYPE html>\n"
 				+ "<html lang=\"ko\">\n"
 				+ "  <head>\n"
@@ -260,7 +266,8 @@ public class MailSenderServiceImpl implements MailSenderService {
 				+ "        </td>\n"
 				+ "        <td style=\"border: 1px solid #444444;\">\n"
 				+ "          <div style=\"font: normal normal normal 16px/21px Noto Sans KR;\">\n"
-				+ "            2021년 6월 29일 22시 34분 51초\n"
+				+ expirationDate
+				+ "\n"
 				+ "          </div>\n"
 				+ "        </td>\n"
 				+ "      </tr>\n"
@@ -390,9 +397,8 @@ public class MailSenderServiceImpl implements MailSenderService {
 
 	private String buildContForSignCopyright(Copyright article)
 	{
-		//Context context = new Context();
-		//context.setVariable("text", context);
-
+		LocalDateTime now = LocalDateTime.now().plusMonths(1);
+		String expirationDate = now.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분"));
 
 		String temp= "<!DOCTYPE html>\n"
 				+ "<html lang=\"ko\">\n"
@@ -501,7 +507,8 @@ public class MailSenderServiceImpl implements MailSenderService {
 				+ "        </td>\n"
 				+ "        <td style=\"border: 1px solid #444444;\">\n"
 				+ "          <div style=\"font: normal normal normal 16px/21px Noto Sans KR;\">\n"
-				+ "            2021년 6월 29일 22시 34분 51초\n"
+				+ expirationDate
+				+ "\n"
 				+ "          </div>\n"
 				+ "        </td>\n"
 				+ "      </tr>\n"
