@@ -114,6 +114,10 @@ fabric.properties
 
 ### Java ###
 # Compiled class file
+src/main/resources/application.yml
+input/
+board/
+result/
 *.class
 bin/
 target/

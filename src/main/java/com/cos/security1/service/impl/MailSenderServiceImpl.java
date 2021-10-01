@@ -33,8 +33,8 @@ public class MailSenderServiceImpl implements MailSenderService {
 
 	@Override
 	public void gmailSendArticle(Article article, String email, String signedPath) {
-		String user = "ddk03121@knu.ac.kr"; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
-		String password = "qw12e3qw12e3";   // 패스워드
+		String user = ""; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
+		String password = "";   // 패스워드
 		String content;
 
 		// SMTP 서버 정보를 설정한다.
@@ -89,8 +89,8 @@ public class MailSenderServiceImpl implements MailSenderService {
 
 	@Override
 	public void gmailSendCopyright(Copyright copyright, String email, String signedPath){
-		String user = "ddk03121@knu.ac.kr"; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
-		String password = "qw12e3qw12e3";   // 패스워드
+		String user = ""; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
+		String password = "";   // 패스워드
 		String content;
 
 		// SMTP 서버 정보를 설정한다.
