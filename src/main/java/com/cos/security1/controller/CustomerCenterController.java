@@ -6,17 +6,27 @@ import com.cos.security1.repository.*;
 import com.cos.security1.service.FileService;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -28,7 +38,75 @@ public class CustomerCenterController {
     private CustomerCenterRepository customerCenterRepository;
 
     @Autowired
-    private FileService fileService;
+    private FileService fileServiceImpl;
+
+    //게시글 찾기
+    @GetMapping("/customerCenter")
+    public String editSearch(@PageableDefault(size=5, sort="id",direction = Sort.Direction.DESC) Pageable pageable, ModelMap model)
+    {
+        Page<CustomerCenter> pagelist = customerCenterRepository.findAll(pageable);
+
+        int pageNumber=pagelist.getPageable().getPageNumber(); //현재페이지
+        int totalPages=pagelist.getTotalPages(); //총 페이지 수. 검색에따라 10개면 10개..
+        int pageBlock = 5; //블럭의 수 1, 2, 3, 4, 5
+        int startBlockPage = ((pageNumber)/pageBlock)*pageBlock+1; //현재 페이지가 7이라면 1*5+1=6
+        int endBlockPage = startBlockPage+pageBlock-1; //6+5-1=10. 6,7,8,9,10해서 10.
+
+        endBlockPage= totalPages<endBlockPage? totalPages:endBlockPage;
+        model.addAttribute("startBlockPage", startBlockPage);
+        model.addAttribute("endBlockPage", endBlockPage);
+        model.addAttribute("postlist", pagelist);
+
+        return "customerCenter";
+    }
+
+    @GetMapping(value = "/customerDown/{id}")
+    public ResponseEntity<InputStreamResource> getCustomer(@PathVariable("id") String id) throws FileNotFoundException, UnsupportedEncodingException {
+
+        CustomerCenter customerCenter = customerCenterRepository.findById(Long.parseLong(id));
+        System.out.println("파일명 : "+ customerCenter.getFilename() );
+        String encordedFilename = URLEncoder.encode(customerCenter.getFilename(),"UTF-8").replace("+", "%20");
+        String filePath = fileServiceImpl.getUpCustomerCenter() +File.separator + customerCenter.getServer_filename();
+        File file = new File(filePath);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("content-disposition", "attachment;filename=" +encordedFilename);
+
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        if(id.indexOf(".pdf")!=-1)
+        {
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .contentType(MediaType.parseMediaType("application/pdf"))
+                    .body(resource);
+        }
+        else
+        {
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .body(resource);
+        }
+
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/checkCustomerPass", method= {RequestMethod.GET})
+    public String checkCustomerPass(@RequestParam("id") String id, @RequestParam("pass") String pass)
+    {
+        //System.out.println("id : "+id + " , pass : "+pass);
+        CustomerCenter customerCenter = customerCenterRepository.findById(Long.parseLong(id));
+        String success="failed";
+
+        if(customerCenter.getSecretpassword()!=null && customerCenter.getSecretpassword().equals(pass))
+        {
+            success="success";
+            return success;
+        }
+
+        return success;
+    }
 
     @PostMapping("/user/customerShowpost")
     public String showPost(@RequestParam("id") String id, Model model)
@@ -66,7 +144,7 @@ public class CustomerCenterController {
 
             if(cos.getServer_filename() != null && cos.getServer_filename().length() >= 1)
             {
-                File delfile = new File(fileService.getUpCustomerCenter() + File.separator + cos.getServer_filename());
+                File delfile = new File(fileServiceImpl.getUpCustomerCenter() + File.separator + cos.getServer_filename());
                 delfile.delete();
                 System.out.println("게시글 파일 삭제");
             }
@@ -113,7 +191,7 @@ public class CustomerCenterController {
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 
             query = new CustomerCenter( title, textbody, principal.getUsername(), principal.getRealname(),null, secret, secretpassword, file.getOriginalFilename(),servername + "."+ extension);
-            fileService.fileCustomerCenterUpload(file, query.getServer_filename());
+            fileServiceImpl.fileCustomerCenterUpload(file, query.getServer_filename());
         }
         else
             query = new CustomerCenter( title, textbody, principal.getUsername(),principal.getRealname(), null, secret, secretpassword, null,null);
