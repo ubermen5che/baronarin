@@ -52,7 +52,7 @@ public class UserDetailsImpl implements UserDetails{
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return user.getUsername();
+		return user.getEmail();
 	}
 
 
@@ -79,12 +79,12 @@ public class UserDetailsImpl implements UserDetails{
 	
 	public String getRealname()
 	{
-		return user.getRealname();
+		return user.getRealName();
 	}
 	
 	public String getSignname()
 	{
-		return user.getSignname();
+		return user.getSignName();
 	}
 	
 	
