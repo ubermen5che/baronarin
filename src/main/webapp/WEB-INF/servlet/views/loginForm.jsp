@@ -1,12 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>
 <%@ page import="org.springframework.security.core.Authentication" %>
-
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>   
 
 <!DOCTYPE html>
     <html>
@@ -89,10 +86,8 @@
         <form action="/login"method='POST' class="loginForm">
         
          <c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION}">
-
-        <div data-layer="1d22a581-66be-4fe5-ba69-c560f0084902" class="x5cc6bb60">가입하지 않은 아이디 또는 잘못된 패스워드입니다. 다시 확인해주세요.</div>
-        
-        <c:remove var="SPRING_SECURITY_LAST_EXCEPTION" scope="session"/>
+            <div data-layer="1d22a581-66be-4fe5-ba69-c560f0084902" class="x5cc6bb60">가입하지 않은 아이디 또는 잘못된 패스워드입니다. 다시 확인해주세요.</div>
+            <c:remove var="SPRING_SECURITY_LAST_EXCEPTION" scope="session"/>
         </c:if>
         
         <div class="x1bd70d98" style="padding-top: 5px;"><input type="text" maxlength="30" name="username" style="position:absolute; width:350px;padding-top: 5px; border:none;border-right:0px; border-top:0px; border-left:0px; border-bottom:0px;text-align:left;font-size:20px;" size="30" placeholder="아이디"/></div>

@@ -64,7 +64,6 @@
 										<sec:authentication property="principal" var="principal" />
 										<c:if test="${principal.role eq 'ROLE_ADMIN'}">
 												<li style="margin-left:14px; margin-right:6px;"><a href="/user/adminPage" class="btn5" style="cursor: pointer">관리자페이지</a></li>
-					                            
 										</c:if>
 										
 										<li style="margin-left:14px; margin-right:6px;"><a href="/user/myPage" class="btn5" style="cursor: pointer">마이페이지</a></li>

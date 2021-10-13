@@ -126,17 +126,17 @@
 								${number}
 							</div>
 							<div id="centry2" class="my_page_data" style="text-align:center;top:${total}px;left:206px;width:300px;">
-								${data.realname}
+								${data.realName}
 							</div>
 							<div id="centry3" class="my_page_data" style="top:${total}px;left:620px;color: #AAAAAA;">
-								${data.username}
+								${data.email}
 							</div>
 							<div id="centry4" class="my_page_data" style="top:${total}px;left:956px;font-weight: bold;">
 								
 							
 								<form action="/user/adminmyPage" method="post" id="ongoing_submit">
 									<button>Link</button>
-									<input type="hidden" name="username" value="${data.username}">
+									<input type="hidden" name="username" value="${data.email}">
 									
 								</form>
 								

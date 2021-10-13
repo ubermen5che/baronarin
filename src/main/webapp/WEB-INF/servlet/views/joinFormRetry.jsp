@@ -240,8 +240,8 @@
 
 
 <form method="post" action="/join" id="formId" enctype="multipart/form-data">
-		<input type="hidden" name="realname" id="realName2">
-		<input type="hidden"  name="username"  id="idName" >
+		<input type="hidden" name="realName" id="realName2">
+		<input type="hidden"  name="email"  id="idName" >
 		<!--  <input style="display:none;" multiple="multiple" type="file" name="uploadFile" id="inputfile" class="button">-->
 		
 		 <div style="position: absolute;top: 540px;left: 761px">
