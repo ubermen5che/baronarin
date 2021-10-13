@@ -5,15 +5,13 @@
 			<%@ page import="org.springframework.security.core.Authentication" %>
 
 				<!DOCTYPE html>
-				<html>
-
 				<head>
 					<title>Baronarin(Beta)</title>
 					<meta charset="UTF-8">
 					<meta name="copyright" content="Copyright (c) 2021 VANE company All rights reserved">
 					<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 					<link rel="stylesheet" type="text/css" href="/css/style.css?ver=1">
-					<link rel="stylesheet" type="text/css" href="/css/style_documentpage2.css?ver=1">
+					<link rel="stylesheet" type="text/css" href="/css/style_documentpage2.css?ver=2">
 					<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 					<link rel="stylesheet" type="text/css" href="/css/style.css?ver=5">
@@ -66,8 +64,9 @@
 							margin: 2px;
 						}
 					</style>
+					<meta name="viewport" content="width=device-width,initial-scale=1">
 				</head>
-
+			<div id="wrapIframe">
 				<body>
 					<div id="Page" style="width: 100%; height:100%">
 						<div id="Controll_Layer">
@@ -596,8 +595,6 @@
 										size="20">
 								</div>
 								<div id="remote_2">
-
-
 									<br>
 									<div style="font: normal normal normal 16px/30px Noto Sans KR;margin-bottom:10px;">
 										서명 인원 선택</div>
@@ -1350,5 +1347,5 @@
 				</script>
 				<div id = "add" style="display:none;"></div>
 				</body>
-
+			</div>
 	</html>
