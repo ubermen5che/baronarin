@@ -5,18 +5,27 @@ import com.cos.security1.domain.Article;
 import com.cos.security1.domain.Copyright;
 import com.cos.security1.domain.User;
 import com.cos.security1.repository.*;
+import com.cos.security1.service.MailSenderService;
+import com.cos.security1.service.UserService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import java.util.List;
-import java.util.Vector;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 public class UserController {
@@ -28,6 +37,15 @@ public class UserController {
 
     @Autowired
     private CopyrightRepository copyrightRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private MailSenderService mailSenderService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/user")
     public String userMain() {
@@ -166,7 +184,7 @@ public class UserController {
             return "redirect:/";
         }
 
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByEmail(username);
 
         List<Article> articleList = articleRepository.findAll();
 
@@ -175,21 +193,21 @@ public class UserController {
         List<Article> completed = new Vector<Article>();
 
         for (Article arti : articleList) {
-            if (user.getUsername().equals(arti.getPeople1_email())) {
+            if (user.getEmail().equals(arti.getPeople1_email())) {
                 if (arti.getSign_count() == arti.getPeople_size())
                     completed.add(arti);
                 else
                     ongoing.add(arti);
             }
 
-            if (user.getUsername().equals(arti.getPeople2_email())) {
+            if (user.getEmail().equals(arti.getPeople2_email())) {
                 if (arti.getSign_count() == arti.getPeople_size())
                     completed.add(arti);
                 else
                     ongoing.add(arti);
             }
 
-            if (user.getUsername().equals(arti.getPeople3_email())) {
+            if (user.getEmail().equals(arti.getPeople3_email())) {
                 if (arti.getSign_count() == arti.getPeople_size())
                     completed.add(arti);
                 else
@@ -197,9 +215,9 @@ public class UserController {
             }
         }
 
-        model.addAttribute("name", user.getRealname());
-        model.addAttribute("email", user.getUsername());
-        model.addAttribute("signname", user.getSignname());
+        model.addAttribute("name", user.getRealName());
+        model.addAttribute("email", user.getEmail());
+        model.addAttribute("signname", user.getSignName());
 
         List<Copyright> copyrightList = copyrightRepository.findAll();
 
@@ -207,7 +225,7 @@ public class UserController {
         List<Copyright> completed2 = new Vector<Copyright>();
 
         for (Copyright arti : copyrightList) {
-            if (user.getUsername().equals(arti.getPeople1_email())) {
+            if (user.getEmail().equals(arti.getPeople1_email())) {
                 if (arti.getSign_count() == arti.getPeople_size())
                     completed2.add(arti);
                 else
@@ -235,11 +253,10 @@ public class UserController {
     //마이페이지
     @SuppressWarnings("unused")
     @GetMapping("/user/adminPage")
-    public String adminpage(Model model)
-    {
-        UserDetailsImpl principal= (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public String adminpage(Model model) {
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(!(principal!=null && principal.getRole().equals("ROLE_ADMIN"))) {
+        if (!(principal != null && principal.getRole().equals("ROLE_ADMIN"))) {
             return "redirect:/";
         }
         List<User> userList = userRepository.findAll();
@@ -253,9 +270,128 @@ public class UserController {
     }
 
     @GetMapping("/user/editor")
-    public String editor()
-    {
+    public String editor() {
         return "user/customerEditor";
+    }
+
+    //SecurityConfig 작성후엔 스프링 시큐리티가 자동으로 안잡아줌
+    @RequestMapping(value = {"/loginForm"}, method = RequestMethod.GET)
+    public String loginform(HttpServletRequest req) {
+        return "loginForm";
+    }
+
+    @PostMapping("/findUserId")
+    public String findUserId() {
+        return "redirect:/joinForm";
+
+    }
+
+    @RequestMapping(value = {"/joinForm"}, method = RequestMethod.GET)
+    public String joinForm(Model model) {
+        return "joinFormRetry";
+    }
+
+    //아이디 중복체크 RedirectAttributes는 redirect: 리턴 시 쓸 수 있음
+    @RequestMapping(value = {"/dupname"}, method = RequestMethod.POST)
+    public String dupname(String checkname, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        //이메일 형식인지 검사
+        boolean err = false;
+        String regex = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(checkname);
+        if (m.matches()) {
+            err = true;
+        }
+
+        //이메일 형식일 경우
+        if (err)
+
+            //해당 아이디가 없다면,
+            //빈 값이 아닐 경우
+            if (checkname.replaceAll("(^\\p{Z}+|\\p{Z}+$)", "") != null && userRepository.findByEmail(checkname) == null) {
+                System.out.println("해당이름 사용가능 : " + checkname.replaceAll("(^\\p{Z}+|\\p{Z}+$)", "") + ", " + request.getAttribute("checkName"));
+
+                redirectAttributes.addFlashAttribute("checkSuccess", 1);
+            } else {
+
+                redirectAttributes.addFlashAttribute("checkSuccess", -1);
+            }
+        else {
+            redirectAttributes.addFlashAttribute("checkSuccess", -2);
+        }
+        redirectAttributes.addFlashAttribute("checkName", checkname);
+        String referer = request.getHeader("Referer");
+        return "redirect:" + referer;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/idCheck", method = RequestMethod.POST)
+    public int IdCheck(@RequestBody String memberId) throws Exception {
+
+        boolean err = false;
+        String regex = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(memberId);
+
+        if (m.matches()) {
+            err = true;
+        }
+
+        int count = -1;
+
+        if (err) {
+            if (userRepository.findByEmail(memberId) == null) {
+                count = 0;
+            } else {
+                count = 1;
+            }
+        }
+        return count;
+    }
+
+    @PostMapping("/join")//GetMapping이 post지원 안해준다해서
+    public String join(User user, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //String test="평문";
+        user.setRole("ROLE_USER");
+        //userRepository.save(user);// 시큐리티로 로그인 불가=>패스워드 암호화가 안됨
+        String rawPassword = user.getPassword();
+        String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+        user.setPassword(encPassword);
+
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(1024);
+        KeyPair keyPair = generator.generateKeyPair();
+
+        PublicKey publickey = keyPair.getPublic();
+        PrivateKey privatekey = keyPair.getPrivate();
+
+        user.setPrivateKey(Base64.getEncoder().encodeToString(privatekey.getEncoded()));
+        user.setPublicKey(Base64.getEncoder().encodeToString(publickey.getEncoded()));
+
+        //임의의 authKey 생성 & 이메일 발송
+        System.out.println("user.getEmail() = " + user.getEmail());
+        String authKey = mailSenderService.sendAuthMail(user.getEmail());
+        user.setAuthKey(authKey);
+        user.setAuthStatus("N");
+        userRepository.save(user);
+
+        return "redirect:/loginForm";//redirect는 loginForm함수 호출
+    }
+
+    //map <authKey : authkey(RandomNumber)>
+    @RequestMapping(value = {"/signUpConfirm"}, method = RequestMethod.GET)
+    public String signUpConfirm(@RequestParam Map<String, String> map){
+        Boolean res;
+
+        //email, authKey 가 일치할경우 authStatus 업데이트
+        System.out.println("map = " + map.get("email"));
+        res = userService.updateAuthStatus(map.get("email"));
+
+        if (res == true){
+            return "redirect:/loginForm";
+        }
+
+        return "redirect:/";
     }
 }
 

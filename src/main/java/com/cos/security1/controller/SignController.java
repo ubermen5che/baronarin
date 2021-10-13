@@ -216,32 +216,32 @@ public class SignController {
         switch(savedArticle.getPeople_size())
         {
             case 3:
-                User user3 = userRepository.findByUsername(savedArticle.getPeople3_email());
+                User user3 = userRepository.findByEmail(savedArticle.getPeople3_email());
                 if(user3==null)
                 {
                     isValidUser=false;
                     break;
                 }
-                savedArticle.setPeople3_signname(user3.getSignname());
-                System.out.println("사인 이름3 : "+user3.getSignname());
+                savedArticle.setPeople3_signname(user3.getSignName());
+                System.out.println("사인 이름3 : "+user3.getSignName());
             case 2:
-                User user2 = userRepository.findByUsername(savedArticle.getPeople2_email());
+                User user2 = userRepository.findByEmail(savedArticle.getPeople2_email());
                 if(user2==null)
                 {
                     isValidUser=false;
                     break;
                 }
-                savedArticle.setPeople2_signname(user2.getSignname());
-                System.out.println("사인 이름2 : "+user2.getSignname());
+                savedArticle.setPeople2_signname(user2.getSignName());
+                System.out.println("사인 이름2 : "+user2.getSignName());
             case 1:
-                User user = userRepository.findByUsername(savedArticle.getPeople1_email());
+                User user = userRepository.findByEmail(savedArticle.getPeople1_email());
                 if(user==null)
                 {
                     isValidUser=false;
                     break;
                 }
-                savedArticle.setPeople1_signname(user.getSignname());
-                System.out.println("사인 이름1 : "+user.getSignname());
+                savedArticle.setPeople1_signname(user.getSignName());
+                System.out.println("사인 이름1 : "+user.getSignName());
         }
 
         if(isValidUser)
@@ -295,10 +295,10 @@ public class SignController {
         //경로저장
         savedCopyright.setFile_path(fileService.getUpDownloadDir()+File.separator+savedCopyright.getSer_fileName());
 
-        User user = userRepository.findByUsername(savedCopyright.getPeople1_email());
+        User user = userRepository.findByEmail(savedCopyright.getPeople1_email());
         if(user!=null)
         {
-            savedCopyright.setPeople1_signname(user.getSignname());
+            savedCopyright.setPeople1_signname(user.getSignName());
         }
         copyrightRepository.save(savedCopyright);
         //System.out.println("계약서 생성 시간1 : "+savedArticle.getCreateDate().toString() );
@@ -325,11 +325,11 @@ public class SignController {
 
         Article tempArt = articleRepository.findByPapername(title);
 
-        User tempUser =  userRepository.findByUsername(principal.getUsername());
+        User tempUser =  userRepository.findByEmail(principal.getUsername());
 
         if (tempUser != null ) {
-            System.out.println("서명파일 : " + tempUser.getSignname());
-            if (tempUser.getSignname() != null) {
+            System.out.println("서명파일 : " + tempUser.getSignName());
+            if (tempUser.getSignName() != null) {
                 File deleteFile = new File(fileService.getUpDownloadDir() + File.separator + "userSign" + File.separator + principal.getSignname());
 
                 if(deleteFile.delete())
@@ -361,7 +361,7 @@ public class SignController {
                 }
                 articleRepository.save(tempArt);
             }
-            tempUser.setSignname(principal.getUsername()+"_sign.png");
+            tempUser.setSignName(principal.getUsername()+"_sign.png");
             userRepository.save(tempUser);
         }
         return result;
@@ -378,11 +378,11 @@ public class SignController {
 
         Copyright tempArt = copyrightRepository.findByPapername(title);
 
-        User tempUser =  userRepository.findByUsername(principal.getUsername());
+        User tempUser =  userRepository.findByEmail(principal.getUsername());
 
         if (tempUser != null ) {
-            System.out.println("서명파일 : " + tempUser.getSignname());
-            if (tempUser.getSignname() != null) {
+            System.out.println("서명파일 : " + tempUser.getSignName());
+            if (tempUser.getSignName() != null) {
                 File deleteFile = new File(fileService.getUpDownloadDir() + File.separator + "userSign" + File.separator + principal.getSignname());
 
                 if(deleteFile.delete())
@@ -403,7 +403,7 @@ public class SignController {
                 }
                 copyrightRepository.save(tempArt);
             }
-            tempUser.setSignname(principal.getUsername()+"_sign.png");
+            tempUser.setSignName(principal.getUsername()+"_sign.png");
             userRepository.save(tempUser);
         }
 
@@ -416,10 +416,10 @@ public class SignController {
     {
         UserDetailsImpl principal= (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User tempUser =  userRepository.findByUsername(principal.getUsername());
+        User tempUser =  userRepository.findByEmail(principal.getUsername());
 
-        if (tempUser != null && tempUser.getSignname() != null && tempUser.getSignname().length() >= 1) {
-            File file =new File("input"+File.separator + "userSign"+File.separator+tempUser.getSignname());
+        if (tempUser != null && tempUser.getSignName() != null && tempUser.getSignName().length() >= 1) {
+            File file =new File("input"+File.separator + "userSign"+File.separator+tempUser.getSignName());
             System.out.println("서명파일 확인 : " + file.getAbsolutePath());
 
             if(file.exists())
