@@ -1,5 +1,6 @@
 package com.cos.security1.service.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -11,6 +12,8 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.cos.security1.common.MailInfo;
+import com.cos.security1.common.MailUtils;
 import com.cos.security1.domain.Copyright;
 import com.cos.security1.service.MailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +26,19 @@ import com.cos.security1.domain.Article;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 @Service
-@AllArgsConstructor
 public class MailSenderServiceImpl implements MailSenderService {
 
-	@Autowired
-	 private JavaMailSender mailSender;
+	@Autowired private JavaMailSender mailSender;
+
+	public int size;
 
 	@Override
 	public void gmailSendArticle(Article article, String email, String signedPath) {
-		String user = ""; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
-		String password = "";   // 패스워드
+		String user = MailInfo.GMAIL_ID; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
+		String password = MailInfo.GMAIL_PW;   // 패스워드
 		String content;
 
 		// SMTP 서버 정보를 설정한다.
@@ -89,8 +93,8 @@ public class MailSenderServiceImpl implements MailSenderService {
 
 	@Override
 	public void gmailSendCopyright(Copyright copyright, String email, String signedPath){
-		String user = ""; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
-		String password = "";   // 패스워드
+		String user = MailInfo.GMAIL_ID; // 네이버일 경우 네이버 계정, gmail경우 gmail 계정
+		String password = MailInfo.GMAIL_PW;   // 패스워드
 		String content;
 
 		// SMTP 서버 정보를 설정한다.
@@ -632,6 +636,55 @@ public class MailSenderServiceImpl implements MailSenderService {
 				+ "";
 
 		return temp;
+	}
+
+	//인증키 생성
+	private String getKey(int size) {
+		this.size = size;
+		return getAuthCode();
+	}
+
+	//인증코드 난수 발생
+	private String getAuthCode() {
+		Random random = new Random();
+		StringBuffer buffer = new StringBuffer();
+		int num = 0;
+
+		while(buffer.length() < size) {
+			num = random.nextInt(10);
+			buffer.append(num);
+		}
+
+		return buffer.toString();
+	}
+
+	//인증메일 보내기
+	public String sendAuthMail(String email) {
+		//6자리 난수 인증번호 생성
+		String authKey = getKey(6);
+		System.out.println("sendAuthMail/email = " + email);
+		//인증메일 보내기
+		try {
+			MailUtils sendMail = new MailUtils(mailSender);
+			sendMail.setSubject("회원가입 이메일 인증");
+			sendMail.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
+					.append("<p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p>")
+					.append("<a href='http://localhost:8090/signUpConfirm?email=")
+					.append(email)
+					.append("&authKey=")
+					.append(authKey)
+					.append("' target='_blenk'>이메일 인증 확인</a>")
+					.toString());
+			sendMail.setFrom(MailInfo.ADMIN_ID, "관리자");
+			sendMail.setTo(email);
+			sendMail.send();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		return authKey;
 	}
 
 	private void setProperties(Properties prop) {

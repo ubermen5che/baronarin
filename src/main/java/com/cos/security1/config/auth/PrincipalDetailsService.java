@@ -26,16 +26,17 @@ public class PrincipalDetailsService implements UserDetailsService {
 		// TODO Auto-generated method stub
 		//<input type="text" name="username" placeholder="Username"/><br/>에서 name="username"과
 		//파라미터 이름이 다르면 동작 안함, username으로 쓸것
-		
-		User userEntity = userRepository.findByUsername(username);//jpa query method
+		String email = username;
+
+		User userEntity = userRepository.findByEmail(email);//jpa query method
 		//유저 이름으로 찾아봄
-		
-		if(userEntity != null)//아이디가 존재한다면
+		System.out.println("userEntity = " + userEntity);
+		if(userEntity != null && userEntity.getAuthStatus().equals("Y"))//아이디가 존재하고 Auth가 유효하면
 		{
 			return new UserDetailsImpl(userEntity);
+		} else{
+			return new UserDetailsImpl(new User());
 		}
-		
-		return null;
 	}
 
 }
