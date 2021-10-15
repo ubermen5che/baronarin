@@ -5,20 +5,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.firebase.auth.AbstractFirebaseAuth;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,25 +25,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.data.domain.Sort;
 
-import com.cos.security1.domain.CustomerCenter;
-import com.cos.security1.domain.Post;
 import com.cos.security1.service.impl.FileServiceImpl;
 import com.cos.security1.domain.User;
-import com.cos.security1.repository.PostRepository;
-import com.cos.security1.repository.CustomerCenterRepository;
 import com.cos.security1.repository.UserRepository;
 //import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
@@ -54,13 +45,10 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.text.SimpleDateFormat;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 //import org.apache.commons.codec.binary.Base64;
 import java.util.Base64;
-import java.util.Date;
 import java.nio.charset.*;
 
 
@@ -78,6 +66,9 @@ public class IndexController {
 
 	@Autowired
     private FileServiceImpl fileServiceImpl;
+
+	@Autowired
+	private FirebaseAuth firebaseAuth;
 	
 	//localhost8090
 	@RequestMapping(value = {"","/"}, method = RequestMethod.GET)//@GetMapping({"","/"})
@@ -221,5 +212,22 @@ public class IndexController {
 	                .contentType(MediaType.parseMediaType("application/octet-stream"))
 	                .body(resource);
 		}
+	}
+
+//	ChkTelPopUpPage에서 AJAX로 요청 : 파이어베이스 로그인 token이 헤더로 날라옴
+//	받은 토큰으로 uid를 파이어베이스로 부터 받아온다
+	@GetMapping("/fb")
+	public void fb(HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		FirebaseToken decodedToken;
+		String header = request.getHeader("Authorization");
+
+		try{
+			decodedToken = firebaseAuth.verifyIdToken(header);
+			System.out.println(decodedToken.getUid());
+		} catch (FirebaseAuthException e) {
+//            setUnauthorizedResponse(response, "INVALID_TOKEN");
+            return;
+        }
 	}
 }
