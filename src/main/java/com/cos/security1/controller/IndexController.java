@@ -84,7 +84,11 @@ public class IndexController {
 	{
 		return "popup";
 	}
-
+	@GetMapping("/ChkTelPopUpPage")
+	public String ChkTelPopUpPage()
+	{
+		return "ChkTelPopUpPage";
+	}
 	@GetMapping("/admin")
 	public @ResponseBody String admin()
 	{
