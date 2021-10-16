@@ -288,7 +288,7 @@ public class UserController {
 
     @RequestMapping(value = {"/joinForm"}, method = RequestMethod.GET)
     public String joinForm(Model model) {
-        return "joinFormRetry";
+        return "newRegisterPage";
     }
 
     //아이디 중복체크 RedirectAttributes는 redirect: 리턴 시 쓸 수 있음
@@ -352,6 +352,7 @@ public class UserController {
     @PostMapping("/join")//GetMapping이 post지원 안해준다해서
     public String join(User user, HttpServletRequest request, HttpServletResponse response) throws Exception {
         //String test="평문";
+
         user.setRole("ROLE_USER");
         //userRepository.save(user);// 시큐리티로 로그인 불가=>패스워드 암호화가 안됨
         String rawPassword = user.getPassword();
