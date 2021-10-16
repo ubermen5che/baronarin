@@ -16,22 +16,10 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="/customerCenter">고객센터</a></li>
                     <li class="nav-item"><a class="nav-link" href="/board">자료실</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/DocumentPage">계약서작성</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/copyright">저작권등록</a></li>
                     <li class="nav-item"><a class="nav-link" href="/joinForm">회원가입</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/loginForm">로그인</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Blog</a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
-                            <li><a class="dropdown-item" href="blog-home.html">Blog Home</a></li>
-                            <li><a class="dropdown-item" href="blog-post.html">Blog Post</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Portfolio</a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownPortfolio">
-                            <li><a class="dropdown-item" href="portfolio-overview.html">Portfolio Overview</a></li>
-                            <li><a class="dropdown-item" href="portfolio-item.html">Portfolio Item</a></li>
-                        </ul>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/loginForm"><button class="nav-item btn-dark">로그인</button></a></li>
                 </ul>
             </div>
         </div>
@@ -54,10 +42,10 @@
                         <!-- To make this form functional, sign up at-->
                         <!-- https://startbootstrap.com/solution/contact-forms-->
                         <!-- to get an API token!-->
-                        <div id="RegisterForm">
+                        <form id="RegisterForm" enctype="multipart/form-data" method="POST" action="/join">
                             <!-- Email address input-->
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="email" type="email" placeholder="name@example.com" data-sb-validations="required,email" />
+                                <input class="form-control" name="email" id="email" type="email" placeholder="name@example.com" data-sb-validations="required,email" />
                                 <label for="email">Email address</label>
                                 <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
                                 <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
@@ -65,14 +53,14 @@
 
                             <!-- Name input-->
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" />
-                                <label for="name">Full name</label>
+                                <input class="form-control" name="realName" id="realName" type="text" placeholder="Enter your name..." data-sb-validations="required" />
+                                <label for="realName">Full name</label>
                                 <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>
                             </div>
                             <!-- Name input-->
                             <div class="form-floating mb-3">
                                 <input class="form-control" name="password"  placeholder="Enter your Password..."  type="password" id="password" data-sb-validations="required"  />
-                                <label for="name">Password</label>
+                                <label for="password">Password</label>
                                 <div class="invalid-feedback" data-sb-feedback="password:required">A password is required.</div>
                             </div>
 
@@ -90,42 +78,8 @@
                             </div>
 
                             <!-- SignUp Button-->
-                            <div class="d-grid"><button class="btn btn-primary btn-lg" id="SignUpBtn" onclick="BtnClkSignUp()">Sign Up</button></div>
-
-                            <script>
-                                function BtnClkSignUp(){
-                                    if(!chktelbtn){
-                                        alert("false");
-                                        return;
-                                    }
-                                    var params={
-                                        email:	$("#email").value,
-                                        password: $('#password').value,
-                                        realName : $('#name').value,
-                                        phoneNumber : $('#phone').value
-                                    }
-                                    $.ajax({
-                                        async : true,
-                                        type : 'POST',
-                                        data: params,
-                                        url: "/join",
-                                        dataType: "json",
-                                        contentType: "application/json; charset=UTF-8",
-                                        success: function(res) {
-                                            if(res==true){
-                                                alert("가입된 이메일로 메일이 전송되었습니다. 링크를 통해 인증을 해주시길 바랍니다.");
-                                            }
-                                            else{
-                                                alert(res);
-                                            }
-                                        },
-                                        error: function(error){
-                                            alert("오류발생:"+error);
-                                        }
-                                    });
-                                }
-                            </script>
-                        </div>
+                            <div class="d-grid"><button class="btn btn-primary btn-lg" id="SignUpBtn" type="submit">Sign Up</button></div>
+                        </form>
                     </div>
 
                 </div>

@@ -32,7 +32,7 @@
                     <li class="nav-item"><a class="nav-link" href="/customerCenter">고객센터</a></li>
                     <li class="nav-item"><a class="nav-link" href="/board">자료실</a></li>
                     <li class="nav-item"><a class="nav-link" href="/user/DocumentPage">계약서작성</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/user/DocumentPage2">저작권등록</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/copyright">저작권등록</a></li>
                     <sec:authorize access="isAnonymous()">
                         <script>
                             function announce() {
