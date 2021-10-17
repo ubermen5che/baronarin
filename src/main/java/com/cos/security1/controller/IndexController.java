@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -221,17 +222,26 @@ public class IndexController {
 //	ChkTelPopUpPage에서 AJAX로 요청 : 파이어베이스 로그인 token이 헤더로 날라옴
 //	받은 토큰으로 uid를 파이어베이스로 부터 받아온다
 	@GetMapping("/fb")
-	public void fb(HttpServletRequest request, HttpServletResponse response) throws Exception
+	@ResponseBody
+	public JSONObject fb(HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
+		JSONObject res = new JSONObject();
 		FirebaseToken decodedToken;
 		String header = request.getHeader("Authorization");
 		System.out.println(header);
 		try{
 			decodedToken = firebaseAuth.verifyIdToken(header);
-			System.out.println(decodedToken.getUid());
+			System.out.println("decodedToken = " + decodedToken);
+			if (decodedToken != null){
+				res.put("res", "true");
+				return res;
+			}
 		} catch (Exception e) {
 //            setUnauthorizedResponse(response, "INVALID_TOKEN");
-            return;
+			res.put("res", "false");
+            return res;
         }
+		res.put("res", "false");
+		return res;
 	}
 }
