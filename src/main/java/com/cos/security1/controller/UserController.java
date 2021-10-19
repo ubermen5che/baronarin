@@ -7,8 +7,10 @@ import com.cos.security1.domain.User;
 import com.cos.security1.repository.*;
 import com.cos.security1.service.MailSenderService;
 import com.cos.security1.service.UserService;
+import com.google.api.client.json.Json;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -350,9 +352,13 @@ public class UserController {
     }
 
     @PostMapping("/join")//GetMapping이 post지원 안해준다해서
-    public String join(User user, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @ResponseBody
+    public JSONObject join(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) throws Exception {
         //String test="평문";
+        JSONObject jsonRes = new JSONObject();
+        Boolean result = true;
 
+        System.out.println("user = " + user);
         user.setRole("ROLE_USER");
         //userRepository.save(user);// 시큐리티로 로그인 불가=>패스워드 암호화가 안됨
         String rawPassword = user.getPassword();
@@ -376,7 +382,11 @@ public class UserController {
         user.setAuthStatus("N");
         userRepository.save(user);
 
-        return "redirect:/loginForm";//redirect는 loginForm함수 호출
+        jsonRes.put("res", result);
+
+        System.out.println("jsonRes = " + jsonRes);
+
+        return jsonRes;
     }
 
     //map <authKey : authkey(RandomNumber)>

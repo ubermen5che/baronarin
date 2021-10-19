@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <%@include file="/WEB-INF/include/header.jsp" %>
     <title>회원가입</title>
 </head>
@@ -16,10 +17,22 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="/customerCenter">고객센터</a></li>
                     <li class="nav-item"><a class="nav-link" href="/board">자료실</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/user/DocumentPage">계약서작성</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/user/copyright">저작권등록</a></li>
                     <li class="nav-item"><a class="nav-link" href="/joinForm">회원가입</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/loginForm"><button class="nav-item btn-dark">로그인</button></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/loginForm">로그인</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Blog</a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
+                            <li><a class="dropdown-item" href="blog-home.html">Blog Home</a></li>
+                            <li><a class="dropdown-item" href="blog-post.html">Blog Post</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Portfolio</a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownPortfolio">
+                            <li><a class="dropdown-item" href="portfolio-overview.html">Portfolio Overview</a></li>
+                            <li><a class="dropdown-item" href="portfolio-item.html">Portfolio Item</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -42,19 +55,19 @@
                         <!-- To make this form functional, sign up at-->
                         <!-- https://startbootstrap.com/solution/contact-forms-->
                         <!-- to get an API token!-->
-                        <form id="RegisterForm" enctype="multipart/form-data" method="POST" action="/join">
+                        <div id="RegisterForm">
                             <!-- Email address input-->
                             <div class="form-floating mb-3">
-                                <input class="form-control" name="email" id="email" type="email" placeholder="name@example.com" data-sb-validations="required,email" />
+                                <input class="form-control" id="email" type="email" placeholder="name@example.com" data-sb-validations="required,email" />
                                 <label for="email">Email address</label>
-                                <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
-                                <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
+                                <div class="invalid-feedback" id="emptyEmail" data-sb-feedback="email:required">An email is required.</div>
+                                <div class="invalid-feedback" id="invalidEmail" data-sb-feedback="email:email">Email is not valid.</div>
                             </div>
 
                             <!-- Name input-->
                             <div class="form-floating mb-3">
-                                <input class="form-control" name="realName" id="realName" type="text" placeholder="Enter your name..." data-sb-validations="required" />
-                                <label for="realName">Full name</label>
+                                <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" />
+                                <label for="name">Full name</label>
                                 <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>
                             </div>
                             <!-- Name input-->
@@ -65,23 +78,14 @@
                             </div>
 
                             <div class="form-floating mb-3">
-                                <div class="d-grid"><button class="btn btn-dark btn-outline-warning" id="ChkTelBtn" onclick="ChkTelBtn()">check phone number</button></div>
-                                <script>
-                                    var chktelbtn = false;
-                                    function ChkTelBtn(){
-                                        window.open("/ChkTelPopUpPage","ChkTelPopUpPage","width=400, height=460,left=30,top=30");
-
-
-                                    }
-                                </script>
+                                <div class="d-grid"><button class="btn btn-dark btn-outline-warning" onclick="ChkTelBtn()" id="ChkTelBtn">check phone number</button></div>
 
                             </div>
 
                             <!-- SignUp Button-->
-                            <div class="d-grid"><button class="btn btn-primary btn-lg" id="SignUpBtn" type="submit">Sign Up</button></div>
-                        </form>
+                            <div class="d-grid"><button class="btn btn-primary btn-lg" id="SignUpBtn">Sign Up</button></div>
+                        </div>
                     </div>
-
                 </div>
             </div>
             <!-- Contact cards-->
@@ -134,6 +138,53 @@
 <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
 <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+<script>
+var params={
+    email:	"",
+    password: "",
+    realName : ""
+}
+
+var chktelbtn = false;
+
+function ChkTelBtn(){
+    console.log('hi');
+    window.open("/ChkTelPopUpPage","ChkTelPopUpPage","width=400, height=460,left=30,top=30");
+}
+
+function stubJoinData() {
+    params['email'] = $('#email').val();
+    params['password'] = $('#password').val();
+    params['realName'] = $("#name").val();
+
+    console.log(params);
+}
+
+    $("#SignUpBtn").click(() => {
+        stubJoinData();
+
+        console.log(params);
+
+        $.ajax({
+            async: true,
+            type: 'POST',
+            data: JSON.stringify(params),
+            url: "/join",
+            dataType: "json",
+            contentType: "application/json; charset=UTF-8",
+            success: function (res) {
+                if (res['res'] == true) {
+                    alert("가입된 이메일로 메일이 전송되었습니다. 링크를 통해 인증을 해주시길 바랍니다.");
+                } else {
+                    alert(res);
+                }
+            },
+            error: function (error) {
+                alert("오류발생:" + error);
+            }
+        });
+    });
+</script>
 </body>
 </html>
 
