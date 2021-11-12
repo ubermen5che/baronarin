@@ -63,16 +63,15 @@
                                 <div class="invalid-feedback" id="emptyEmail" data-sb-feedback="email:required">An email is required.</div>
                                 <div class="invalid-feedback" id="invalidEmail" data-sb-feedback="email:email">Email is not valid.</div>
                             </div>
-
                             <!-- Name input-->
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" />
                                 <label for="name">Full name</label>
                                 <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>
                             </div>
-                            <!-- Name input-->
+                            <!-- password input-->
                             <div class="form-floating mb-3">
-                                <input class="form-control" name="password"  placeholder="Enter your Password..."  type="password" id="password" data-sb-validations="required"  />
+                                <input class="form-control" id="password" type="password" name="password"  placeholder="Enter your Password..." data-sb-validations="required"  />
                                 <label for="password">Password</label>
                                 <div class="invalid-feedback" data-sb-feedback="password:required">A password is required.</div>
                             </div>
@@ -142,27 +141,62 @@
 var params={
     email:	"",
     password: "",
-    realName : ""
+    realName : "",
+    phoneNumber : ""
 }
 
-var chktelbtn = false;
+var isPhoneNumberAuthenticated = false; // 휴대폰 인증을 거쳤는지 여부
 
 function ChkTelBtn(){
     console.log('hi');
     window.open("/ChkTelPopUpPage","ChkTelPopUpPage","width=400, height=460,left=30,top=30");
 }
 
+function getPhoneNumberFromFBpopUp(phoneNumber) {
+    // firebase 팝업창으로부터 휴대폰 번호를 받아온다.
+    phoneNumber = phoneNumber.substring(3); //+82 국가코드 잘라내기
+    if(phoneNumber == '1122223333'){
+        //테스트용 전화번호 코드
+    } else {
+        // 국제 전화번호 규칙상 +82 010 1234 5678은 앞의 0을 잘라낸 모양인 +821012345678로 표기된다.
+        // 사라진 0을 붙여주는 작업
+        phoneNumber = '0' + phoneNumber;
+    }
+    $.ajax({
+        //휴대폰 번호 중복검사
+        type: 'POST',
+        data: {"phoneNumber" : phoneNumber},
+        dataType: "json",
+        url: "/phoneNumberCheck",
+        success: function (res) {
+            if (res['res'] == true) {
+                // 중복이 아닌 경우 params에 바로 넣는다.
+                params.phoneNumber = phoneNumber;
+                console.log(phoneNumber);
+                isPhoneNumberAuthenticated = true;
+            } else {
+                alert("이미 가입된 전화번호입니다.");
+            }
+        },
+        error: function (error) {
+            alert("오류발생:" + error);
+        }
+    });
+}
+
 function stubJoinData() {
     params['email'] = $('#email').val();
     params['password'] = $('#password').val();
     params['realName'] = $("#name").val();
-
     console.log(params);
 }
 
     $("#SignUpBtn").click(() => {
         stubJoinData();
-
+        if(isPhoneNumberAuthenticated == false) {
+            alert("휴대폰 번호 인증을 완료하여야 합니다.")
+            return;
+        }
         console.log(params);
 
         $.ajax({

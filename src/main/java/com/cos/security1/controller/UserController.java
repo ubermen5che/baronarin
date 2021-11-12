@@ -8,6 +8,7 @@ import com.cos.security1.repository.*;
 import com.cos.security1.service.MailSenderService;
 import com.cos.security1.service.UserService;
 import com.google.api.client.json.Json;
+import com.google.firebase.auth.FirebaseToken;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -290,7 +291,7 @@ public class UserController {
 
     @RequestMapping(value = {"/joinForm"}, method = RequestMethod.GET)
     public String joinForm(Model model) {
-        return "newRegisterPage";
+        return "joinFormRetry";
     }
 
     //아이디 중복체크 RedirectAttributes는 redirect: 리턴 시 쓸 수 있음
@@ -307,15 +308,12 @@ public class UserController {
 
         //이메일 형식일 경우
         if (err)
-
             //해당 아이디가 없다면,
             //빈 값이 아닐 경우
             if (checkname.replaceAll("(^\\p{Z}+|\\p{Z}+$)", "") != null && userRepository.findByEmail(checkname) == null) {
                 System.out.println("해당이름 사용가능 : " + checkname.replaceAll("(^\\p{Z}+|\\p{Z}+$)", "") + ", " + request.getAttribute("checkName"));
-
                 redirectAttributes.addFlashAttribute("checkSuccess", 1);
             } else {
-
                 redirectAttributes.addFlashAttribute("checkSuccess", -1);
             }
         else {
@@ -349,6 +347,23 @@ public class UserController {
             }
         }
         return count;
+    }
+
+    //휴대폰 번호 중복 검사
+    @PostMapping("/phoneNumberCheck")
+    @ResponseBody
+    public JSONObject phoneNumberCheck(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject res = new JSONObject();
+        String phoneNumber = request.getParameter("phoneNumber");
+
+        if(userRepository.findByPhoneNumber(phoneNumber) == null) {
+            System.out.println(phoneNumber);
+            res.put("res", true);
+            return res;
+        } else{
+            res.put("res", false);
+            return res;
+        }
     }
 
     @PostMapping("/join")//GetMapping이 post지원 안해준다해서

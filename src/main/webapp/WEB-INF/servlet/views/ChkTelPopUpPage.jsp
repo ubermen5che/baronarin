@@ -18,13 +18,14 @@
             measurementId: "G-KJQGEK296K"
         };
         var httpRequest;
-
+        var userPhoneNumber;
         function callBackFunc(){
             if (httpRequest.readyState == 4) {
                 if (httpRequest.status == 200) {
                     var jsonRes = JSON.parse(httpRequest.responseText);
                     if (jsonRes['res'] == "true"){
                         alert("성공적으로 인증되었습니다.");
+                        window.opener.getPhoneNumberFromFBpopUp(userPhoneNumber);
                         window.close();
                     } else
                         alert("json parse error" + jsonRes['res']);
@@ -45,6 +46,12 @@
             callbacks: {
                 // 로그인 성공시 실행
                 signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        // 인증한 폰 번호 가져오는 작업
+                        if(user){
+                            userPhoneNumber = user.phoneNumber;
+                        }
+                    });
                     firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function (idToken) {
                         // 해당 유저의 idToken을 Firebase로부터 받아온다.
                         // idToken을 백엔드 서버로 전송하고 토큰 검증 절차를 처리한다.
@@ -61,6 +68,7 @@
             }
             // Other config options...
         });
+
     </script>
 </head>
 <body>

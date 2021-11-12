@@ -16,5 +16,6 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 	//select * from user where username = 1? 파라미터에 들어온 내용을 넣어줌
 	public User findByEmail(String email);
 	public User findByAuthKey(String authKey);
+	public User findByPhoneNumber(String phoneNumber);
 	//public User findByEmail(String email);
 }
