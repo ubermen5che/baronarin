@@ -77,7 +77,7 @@ public class IndexController {
 	{
 		//Mustache 기본폴더 src/main/resources
 		//뷰리졸버 설정 templates(prefix), mustache(suffix) 생략가능 
-		return "newindex";//src/main/resources/templates/index.mustache
+		return "index";//src/main/resources/templates/index.mustache
 	}
 
 	@GetMapping("/popup")
