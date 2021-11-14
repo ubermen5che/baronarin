@@ -61,7 +61,7 @@ public class FileServiceImpl implements FileService {
     	upResultDir=new File("result").getAbsolutePath();
     	upBoard= new File("board").getAbsolutePath();
     	upCustomerCenter = new File("customerCenter").getAbsolutePath();
-    	
+
     	System.out.println("다운로드 경로 : " + upDownloadDir+"\n완료된 계약서 경로 : "+upResultDir+"\n\n");
     }
     
@@ -177,7 +177,26 @@ public class FileServiceImpl implements FileService {
         }
 
     }
-    
+
+	@Override
+	public Resource loadFile(String subPath, String server_fileName) throws FileNotFoundException {
+
+		try {
+			Path copyOfLocation = Paths.get(upDownloadDir + File.separator + subPath);
+			Path file = copyOfLocation.resolve(server_fileName).normalize();
+			Resource resource = new UrlResource(file.toUri());
+
+			if(resource.exists() || resource.isReadable()) {
+				return resource;
+			}else {
+				throw new FileNotFoundException("Could not find file");
+			}
+		} catch (MalformedURLException e) {
+			throw new FileNotFoundException("Could not download file");
+		}
+
+	}
+
     @Override
 	public void fileBoardUpload(MultipartFile multipartFile, String user_sign_name) {
 		// File.seperator 는 OS종속적이다.

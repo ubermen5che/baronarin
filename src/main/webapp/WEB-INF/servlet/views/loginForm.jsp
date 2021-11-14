@@ -97,6 +97,8 @@
         </c:if>
 
         <div class="x1bd70d98" style="padding-top: 5px;"><input type="text" maxlength="30" name="email" style="position:absolute; width:350px;padding-top: 5px; border:none;border-right:0px; border-top:0px; border-left:0px; border-bottom:0px;text-align:left;font-size:20px;" size="30" placeholder="아이디"/></div>
+
+        <div class="x1bd70d98" style="padding-top: 5px;"><input type="text" maxlength="30" name="email" style="position:absolute; width:350px;padding-top: 5px; border:none;border-right:0px; border-top:0px; border-left:0px; border-bottom:0px;text-align:left;font-size:20px;" size="30" placeholder="아이디"/></div>
         <div data-layer="d600c7c9-aaa5-4d75-8952-6a26e175c380" class="x456451d2b53"></div>
         <div class="xb6bbaf1e" style="padding-top: 5px;"><input type="password" maxlength="20" name="password" style="position:absolute; width:330px;padding-top: 5px; border:none;border-right:0px; border-top:0px; border-left:0px; border-bottom:0px;text-align:left;font-size:20px;" size="30" placeholder="비밀번호"/><br/></div>
 

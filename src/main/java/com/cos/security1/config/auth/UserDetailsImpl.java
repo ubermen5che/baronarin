@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.cos.security1.domain.User;
+import org.springframework.transaction.annotation.Transactional;
 
 //시큐리티가 /login을 낚아채서  로그인 진행
 //로그인을 진행이 완료가 되면 시큐리티 만의 session을 만들어줌, Security ContextHolder라는 키 값에 저장

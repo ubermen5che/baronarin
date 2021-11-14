@@ -51,7 +51,5 @@ spring:
     view:
       prefix: /WEB-INF/servlet/views/
       suffix: .jsp
-      static-path-pattern: /resources/** 
-      
-
+      static-path-pattern: /resources/**
  

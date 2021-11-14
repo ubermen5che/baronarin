@@ -2,36 +2,33 @@ package com.cos.security1.controller;
 
 import com.cos.security1.UserRsa;
 import com.cos.security1.config.auth.UserDetailsImpl;
-import com.cos.security1.domain.Article;
-import com.cos.security1.domain.Copyright;
-import com.cos.security1.domain.MessageForm;
-import com.cos.security1.domain.User;
+import com.cos.security1.domain.*;
 import com.cos.security1.common.Imagetest;
 import com.cos.security1.repository.*;
 import com.cos.security1.service.FileService;
 import com.cos.security1.service.MailSenderService;
+import com.cos.security1.service.UserService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 @Controller
 public class SignController {
@@ -50,6 +47,9 @@ public class SignController {
 
     @Autowired
     private MailSenderService mailSenderService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/user/sign")
     public String userSign(MessageForm message, String title, Timestamp create_time) throws Exception {
@@ -314,11 +314,46 @@ public class SignController {
         return "redirect:/";//홈페이지로 보냄
     }
 
+
+    @ResponseBody//페이지로 응답할 것임을 명시
+    @PostMapping("/upload/sign")
+    public Map<String, String> uploadSign(@RequestParam(value="file", required=true) MultipartFile file)
+    {
+        System.out.println("파일 크기 : "+ file.getSize());
+
+        UserDetailsImpl principal= (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user =  userService.findUser(principal.getUsername());
+
+        System.out.println("user.getSignCount() = " + user.getSignCount());
+        
+        //sign등록 이력이 없는 경우 최초 등록 사인이름은 email_sign1.jpg로 한다.
+        String userSignName = principal.getUsername() + "_sign" + user.getSignCount() + ".jpg";
+
+        fileService.fileUpload(file, userSignName);
+        UserSign userSign = new UserSign();
+        userSign.setUser(user);
+        userSign.setSignFileName(userSignName);
+        userSign.setIsNFT("F");
+        userService.saveUserSign(userSign);
+        user.addUserSign(userSign);
+        System.out.println("user.getSignCount() + 1 = " + user.getSignCount() + 1);
+        user.setSignCount(user.getSignCount() + 1);
+        userService.saveUser(user);
+        Map<String,String> resMap = new HashMap<>();
+        resMap.put("result", "true");
+
+        return resMap;
+    }
+
+
     @ResponseBody//페이지로 응답할 것임을 명시
     @PostMapping("/user/changesign")
     public int changesign(@RequestParam(value="file", required=true) MultipartFile file, @RequestParam(required=false) String title, @RequestParam(required=false) String create_time)
     {
-        System.out.println("파일 이름 : "+ file.getSize());
+        System.out.println("파일 크기 : "+ file.getSize());
+        System.out.println("title = " + title);
+        System.out.println("create_time = " + create_time);
         int result=0;
 
         UserDetailsImpl principal= (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -594,6 +629,53 @@ public class SignController {
         }
     }
 
+    @GetMapping("/user/signUpload")
+    public String mypage(Model model) {
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user = userService.findUser(principal.getUsername());
+        List<UserSign> userSings = user.getUserSigns();
+        List<String> signURLs = new ArrayList<>();
+
+        for (int i = 0; i < userSings.size(); i++){
+            signURLs.add("/sign/" + userSings.get(i).getSignFileName());
+        }
+
+        System.out.println("signURLs = " + signURLs);
+
+        model.addAttribute("signUrls", signURLs);
+
+        return "user/signUpload";
+    }
+
+    @PostMapping(value="/upload/signNFT")
+    public String uploadNFT(HttpServletRequest request){
+
+        String[] ajaxMsg = request.getParameterValues("chkBoxArr");
+        for(String msg : ajaxMsg){
+            System.out.println("msg = " + msg);
+        }
+
+        return "redirect:list";
+    }
+
+    @GetMapping(path = "/sign/{id}")
+    public void setImageFileById(@PathVariable(name = "id") String id, HttpServletResponse response) throws IOException {
+        Resource resource = fileService.loadFile("userSign", id);
+        // 파일 정보를 찾고
+        StringBuilder sb = new StringBuilder("file:///" + fileService.getUpDownloadDir() + "/userSign/");
+        // 파일이 실제로 저장되어 있는 경로에
+        String fileName = resource.getFilename();
+        sb.append(fileName);
+        // 파일 이름을 더해
+
+        URL fileUrl = new URL(sb.toString());
+        // file URL을 생성하고
+
+        IOUtils.copy(fileUrl.openStream(), response.getOutputStream());
+        // IOUtils.copy는 input에서 output으로 encoding 맞춰서 복사하는 메소드다
+        // openStream으로 fileUrl의 통로( 입력 스트림 )를 열고 respons의 outputStream에 복사하면 끝
+    }
     //사인 완료된 result 파일안의 계약서 다운로드
     @PostMapping("/user/completesignedDownload")
     public void completesignedDownload(String title,Timestamp create_time , HttpServletResponse response)

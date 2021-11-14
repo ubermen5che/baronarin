@@ -47,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			
 			.and()
 			.formLogin()
+				.usernameParameter("email")
 			.loginPage("/loginForm")//인증이 요구되는 주소일 때, 로그인 창으로 이동
 			
 			

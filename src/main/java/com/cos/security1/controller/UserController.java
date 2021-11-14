@@ -220,7 +220,6 @@ public class UserController {
 
         model.addAttribute("name", user.getRealName());
         model.addAttribute("email", user.getEmail());
-        model.addAttribute("signname", user.getSignName());
 
         List<Copyright> copyrightList = copyrightRepository.findAll();
 
@@ -395,8 +394,8 @@ public class UserController {
         String authKey = mailSenderService.sendAuthMail(user.getEmail());
         user.setAuthKey(authKey);
         user.setAuthStatus("N");
-        userRepository.save(user);
-
+        user.setSignCount(0);
+        userService.saveUser(user);
         jsonRes.put("res", result);
 
         System.out.println("jsonRes = " + jsonRes);

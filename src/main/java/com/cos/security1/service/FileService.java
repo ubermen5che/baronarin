@@ -11,6 +11,7 @@ public interface FileService {
     void fileCustomerCenterUpload(MultipartFile multipartFile, String user_sign_name);
 
     Resource loadFile(String server_fileName) throws FileNotFoundException;
+    Resource loadFile(String subPath, String server_fileName) throws FileNotFoundException;
 
     void fileBoardUpload(MultipartFile multipartFile, String user_sign_name);
 

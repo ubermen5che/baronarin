@@ -1,0 +1,3 @@
+path:
+  sign_path: '/Users/yong/github/baronarin/input/userSign/'
+  upload_path : '/sign/**'
