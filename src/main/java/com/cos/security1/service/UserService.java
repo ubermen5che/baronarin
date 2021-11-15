@@ -11,4 +11,5 @@ public interface UserService {
     User findUser(String email);
     void saveUser(User user);
     void saveUserSign(UserSign userSign);
+    UserSign findUserSign(String fileName);
 }

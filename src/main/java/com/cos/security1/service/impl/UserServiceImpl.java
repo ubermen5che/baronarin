@@ -21,7 +21,7 @@ public class UserServiceImpl implements com.cos.security1.service.UserService {
     public Boolean updateAuthStatus(String email) {
         System.out.println("updateAuthStatus email = " + email);
         System.out.println("email.getClass() = " + email.getClass());
-        User user = userRepository.findByEmail("serepa03@gmail.com");
+        User user = userRepository.findByEmail(email);
 
         System.out.println("user = " + user);
 
@@ -48,5 +48,10 @@ public class UserServiceImpl implements com.cos.security1.service.UserService {
     @Override
     public void saveUserSign(UserSign userSign) {
         userSignRepository.save(userSign);
+    }
+
+    @Override
+    public UserSign findUserSign(String fileName) {
+        return userSignRepository.findByFileName(fileName);
     }
 }
