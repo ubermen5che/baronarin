@@ -23,15 +23,11 @@ public class PrincipalDetailsService implements UserDetailsService {
 	private UserRepository userRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
-		//<input type="text" name="username" placeholder="Username"/><br/>에서 name="username"과
-		//파라미터 이름이 다르면 동작 안함, username으로 쓸것
-		String email = username;
-		System.out.println("username = " + username);
+		
 		User userEntity = userRepository.findByEmail(email);//jpa query method
 		//유저 이름으로 찾아봄
-		System.out.println("userEntity = " + userEntity);
 		if(userEntity != null && userEntity.getAuthStatus().equals("Y"))//아이디가 존재하고 Auth가 유효하면
 		{
 			return new UserDetailsImpl(userEntity);
