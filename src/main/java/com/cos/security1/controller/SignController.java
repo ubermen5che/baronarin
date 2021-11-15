@@ -11,7 +11,6 @@ import com.cos.security1.service.UserService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -333,7 +331,7 @@ public class SignController {
         fileService.fileUpload(file, userSignName);
         UserSign userSign = new UserSign();
         userSign.setUser(user);
-        userSign.setSignFileName(userSignName);
+        userSign.setFileName(userSignName);
         userSign.setIsNFT("F");
         userService.saveUserSign(userSign);
         user.addUserSign(userSign);
@@ -630,33 +628,50 @@ public class SignController {
     }
 
     @GetMapping("/user/signUpload")
-    public String mypage(Model model) {
+    public String signUploadPage(Model model) {
         UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         User user = userService.findUser(principal.getUsername());
-        List<UserSign> userSings = user.getUserSigns();
-        List<String> signURLs = new ArrayList<>();
+        List<UserSign> userSigns = user.getUserSigns();
 
-        for (int i = 0; i < userSings.size(); i++){
-            signURLs.add("/sign/" + userSings.get(i).getSignFileName());
+        for (int i = 0; i < userSigns.size(); i++){
+            userSigns.get(i).setFileName("/sign/" + userSigns.get(i).getFileName());
         }
 
-        System.out.println("signURLs = " + signURLs);
 
-        model.addAttribute("signUrls", signURLs);
+        model.addAttribute("userSigns", userSigns);
 
         return "user/signUpload";
     }
 
     @PostMapping(value="/upload/signNFT")
-    public String uploadNFT(HttpServletRequest request){
+    @ResponseBody
+    public Map<String, String> uploadNFT(HttpServletRequest request, HttpServletResponse response){
+
+        Map<String, String> resMap = new HashMap<>();
+
+        int imgFileNameIdx;
+        ArrayList<String> fileNames = new ArrayList<>();
 
         String[] ajaxMsg = request.getParameterValues("chkBoxArr");
         for(String msg : ajaxMsg){
-            System.out.println("msg = " + msg);
+            imgFileNameIdx = msg.lastIndexOf("/");
+            fileNames.add(msg.substring(imgFileNameIdx+1));
         }
 
-        return "redirect:list";
+        try {
+            UserSign userSign = userService.findUserSign(fileNames.get(0));
+            userSign.setIsNFT("T");
+            userService.saveUserSign(userSign);
+        }catch (NullPointerException e){
+            resMap.put("res", "false");
+            return resMap;
+        }
+
+        resMap.put("res", "true");
+        System.out.println("resMap = " + resMap);
+
+        return resMap;
     }
 
     @GetMapping(path = "/sign/{id}")
