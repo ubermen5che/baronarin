@@ -453,6 +453,7 @@ public class SignController {
 
         if (tempUser != null && tempUser.getSignName() != null && tempUser.getSignName().length() >= 1) {
             File file =new File("input"+File.separator + "userSign"+File.separator+tempUser.getSignName());
+            System.out.println("file.getPath() = " + file.getPath());
             System.out.println("서명파일 확인 : " + file.getAbsolutePath());
 
             if(file.exists())
@@ -648,6 +649,11 @@ public class SignController {
     @ResponseBody
     public Map<String, String> uploadNFT(HttpServletRequest request, HttpServletResponse response){
 
+        UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userName = principal.getUsername();
+        User user = userService.findUser(userName);
+
+        System.out.println("signNFT user = " + user);
         Map<String, String> resMap = new HashMap<>();
 
         int imgFileNameIdx;
@@ -662,7 +668,11 @@ public class SignController {
         try {
             UserSign userSign = userService.findUserSign(fileNames.get(0));
             userSign.setIsNFT("T");
+            user.setSignName(fileNames.get(0));
+            userRepository.save(user);
+            System.out.println("userSignName = " + user.getSignName());
             userService.saveUserSign(userSign);
+
         }catch (NullPointerException e){
             resMap.put("res", "false");
             return resMap;
