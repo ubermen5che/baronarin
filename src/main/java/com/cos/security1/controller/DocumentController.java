@@ -5,7 +5,6 @@ import com.cos.security1.domain.Article;
 import com.cos.security1.domain.Copyright;
 import com.cos.security1.repository.*;
 import com.cos.security1.service.FileService;
-import com.cos.security1.service.impl.FileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -182,66 +181,60 @@ public class DocumentController {
         UserDetailsImpl principal= (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //계약서 이름으로 db에서 계약서 정보 찾기
-        Article tempArt = articleRepository.findByPapername(title);
+        Article article = articleRepository.findByPapername(title);
 
         boolean signCheck = false;
-        if(tempArt != null)
+        if(article != null)
         {
-
             String one = "1";
-            System.out.println("계약 인원수 : " + tempArt.getPeople_size());
-            switch (tempArt.getPeople_size()) {
-
+            System.out.println("계약 인원수 : " + article.getPeople_size());
+            switch (article.getPeople_size()) {
                 case 1:
-                    if (one.equals(tempArt.getPeople1_sign())) {
+                    if (one.equals(article.getPeople1_sign())) {
                         System.out.println("1인 싸인 완료");
                         signCheck = true;
-
                     }
                     break;
-
                 case 2:
-                    System.out
-                            .println("싸인여부 1 : " + tempArt.getPeople1_sign() + "  싸인 여부 2 : " + tempArt.getPeople2_sign());
-                    if (one.equals(tempArt.getPeople1_sign()) && one.equals(tempArt.getPeople2_sign())) {
+                    System.out.println("싸인여부 1 : " + article.getPeople1_sign() + "  싸인 여부 2 : " + article.getPeople2_sign());
+                    if (one.equals(article.getPeople1_sign()) && one.equals(article.getPeople2_sign())) {
                         System.out.println("2인 싸인 완료");
                         signCheck = true;
                     }
                     break;
-
                 case 3:
-                    if (one.equals(tempArt.getPeople1_sign()) && one.equals(tempArt.getPeople2_sign())
-                            && one.equals(tempArt.getPeople3_sign())) {
+                    if (one.equals(article.getPeople1_sign()) && one.equals(article.getPeople2_sign())
+                            && one.equals(article.getPeople3_sign())) {
                         System.out.println("3인 싸인 완료");
                         signCheck = true;
                     }
-            }
+                }
         }
 
         //서명을 다 한 상태라면 메인화면으로 전송, 혹은 db 손상되어 데이터 유실 시
-        if(tempArt==null || signCheck)
+        if(article==null || signCheck)
         {
             if(signCheck)
                 model.addAttribute("sign_complete","complete");
 
-            else if(tempArt==null)
+            else if(article==null)
                 model.addAttribute("sign_null","null");
 
             return "temp";
         }
 
-        if(tempArt!=null && tempArt.getCreateDate().toString().equals(create_time.toString()))//해당 이름의 계약서가 있고, 계약서 생성시기도 일치할 때
+        if(article!=null && article.getCreateDate().toString().equals(create_time.toString()))//해당 이름의 계약서가 있고, 계약서 생성시기도 일치할 때
         {
             System.out.println("계약서 찾음");
             boolean foundName = false;
 
-            if(tempArt.getPeople1_name().equals(principal.getRealname()))
+            if(article.getPeople1_name().equals(principal.getRealname())) //getRealName 하면 db에 email column 불러옴
                 foundName=true;
 
-            else if(tempArt.getPeople2_name().equals(principal.getRealname()))
+            else if(article.getPeople2_name().equals(principal.getRealname()))
                 foundName=true;
 
-            else if(tempArt.getPeople3_name().equals(principal.getRealname()))
+            else if(article.getPeople3_name().equals(principal.getRealname()))
                 foundName=true;
 
             if(foundName)//계약서에 해당 이름이 있다면
@@ -249,31 +242,31 @@ public class DocumentController {
                 Resource tempResource =null;
                 try {
                     //서버에 있는 파일 찾기
-                    tempResource = fileService.loadFile(tempArt.getSer_fileName());
+                    tempResource = fileService.loadFile(article.getSer_fileName());
                     System.out.println("파일 찾기 성공 : " + tempResource.getFilename());
                 } catch (FileNotFoundException e) {
                     // TODO Auto-generated catch block
                     System.out.println("파일을 찾을 수 없습니다.");
                 }
 
-                if(tempArt.getOrig_name().contains(".pdf"))
+                if(article.getOrig_name().contains(".pdf"))
                     model.addAttribute("is_pdf","yes");
 
 
-                model.addAttribute("paper_name", tempArt.getPapername());
-                model.addAttribute("person_num", tempArt.getPeople_size());
+                model.addAttribute("paper_name", article.getPapername());
+                model.addAttribute("person_num", article.getPeople_size());
 
-                model.addAttribute("file_serverName", tempArt.getSer_fileName());
-                model.addAttribute("orig_Name", tempArt.getOrig_name());
-                model.addAttribute("create_date",tempArt.getCreateDate());
+                model.addAttribute("file_serverName", article.getSer_fileName());
+                model.addAttribute("orig_Name", article.getOrig_name());
+                model.addAttribute("create_date",article.getCreateDate());
 
-                model.addAttribute("person1_name",tempArt.getPeople1_name());
-                model.addAttribute("person2_name",tempArt.getPeople2_name());
-                model.addAttribute("person3_name",tempArt.getPeople3_name());
+                model.addAttribute("person1_name",article.getPeople1_name());
+                model.addAttribute("person2_name",article.getPeople2_name());
+                model.addAttribute("person3_name",article.getPeople3_name());
 
-                model.addAttribute("person1_issign",tempArt.getPeople1_sign());
-                model.addAttribute("person2_issign",tempArt.getPeople2_sign());
-                model.addAttribute("person3_issign",tempArt.getPeople3_sign());
+                model.addAttribute("person1_issign",article.getPeople1_sign());
+                model.addAttribute("person2_issign",article.getPeople2_sign());
+                model.addAttribute("person3_issign",article.getPeople3_sign());
 
                 return "user/DocumentcheckPage";
             }
