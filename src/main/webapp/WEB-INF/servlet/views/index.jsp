@@ -33,7 +33,7 @@
 
 								<ul class="button_layer" style="display: flex;list-style : none; padding-left : 0;">
 									
-									<li> <a class="btn5" onclick="location.href='/user/copyright'" style="cursor:pointer"> 저작권 등록하기 </a>
+									<li> <a class="btn5" onclick="location.href='/user/signUpload'" style="cursor:pointer"> 서명 등록하기 </a>
 									</li>
 									
 									<li> <a class="btn5" onclick="test()" style="cursor:pointer"> 계약서 / 서명 만들기 </a>
