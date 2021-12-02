@@ -641,6 +641,7 @@ public class SignController {
 
 
         model.addAttribute("userSigns", userSigns);
+        model.addAttribute("name", principal.getRealname());
 
         return "user/signUpload";
     }
