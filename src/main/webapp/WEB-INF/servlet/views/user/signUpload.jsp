@@ -350,17 +350,20 @@
             processData : false,	// data 파라미터 강제 string 변환 방지!!
             contentType : false,	// application/x-www-form-urlencoded; 방지!!
             success : function (result) {
-                if(result==0)
+                if(result=='true')
                 {
                     // document.getElementById("input_sign").src= "/img/sign_off.svg";
                     //document.getElementById("input_sign_ancher").onclick = null;
                     document.getElementById("background_gray").style.display = "none";
                     document.getElementById("black_div").style.display = "none";
                     alert('서명 변경성공');
+                    window.location.href = 'http://localhost:8091/user/signUpload';
                 }
             },
             error : function()
             {
+                document.getElementById("background_gray").style.display = "none";
+                document.getElementById("black_div").style.display = "none";
                 alert('서명 변경실패');
             }
 
