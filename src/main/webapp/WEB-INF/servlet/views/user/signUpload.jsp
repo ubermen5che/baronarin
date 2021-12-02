@@ -350,7 +350,7 @@
             processData : false,	// data 파라미터 강제 string 변환 방지!!
             contentType : false,	// application/x-www-form-urlencoded; 방지!!
             success : function (result) {
-                if(result=='true')
+                if(result['result']=='true')
                 {
                     // document.getElementById("input_sign").src= "/img/sign_off.svg";
                     //document.getElementById("input_sign_ancher").onclick = null;
