@@ -356,7 +356,7 @@
                     //document.getElementById("input_sign_ancher").onclick = null;
                     document.getElementById("background_gray").style.display = "none";
                     document.getElementById("black_div").style.display = "none";
-                    alert('서명 변경성공');
+                    alert('서명 등록 성공');
                     window.location.href = 'http://localhost:8091/user/signUpload';
                 }
             },
@@ -364,7 +364,7 @@
             {
                 document.getElementById("background_gray").style.display = "none";
                 document.getElementById("black_div").style.display = "none";
-                alert('서명 변경실패');
+                alert('서명 등록 실패');
             }
 
         });
