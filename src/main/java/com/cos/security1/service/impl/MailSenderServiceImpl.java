@@ -278,7 +278,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 				+ "    </table>\n"
 				+ "    </div>\n"
 				+ "    <div style=\"text-align:left;margin-top:40px;margin-left:312px;\">\n"
-				+"<form target=\"_blank\" action='http://localhost:8090/user/DocumentcheckPage' method='post'>"
+				+"<form target=\"_blank\" action='http://localhost:8091/user/DocumentcheckPage' method='post'>"
 				+ "		<input type='hidden' name='title' value='"+article.getPapername()+"'>"
 				+ "		<input type='hidden' name='create_time' value='"+article.getCreateDate()+"'>\""
 				+ "<button><img style=\"width: 451px;height: 88px;opacity: 1;\" src=\"https://postfiles.pstatic.net/MjAyMTA1MzBfMTY5/MDAxNjIyMzA5NTkzMTUz.YPoMHSKHBEJdjIOUn3Yo1znz04iNYUWiuio63rMsyFcg.r-bEcMrY1e1YpUlrLmMWgAH35R2szk_BXgCp9OBjoFwg.PNG.minkisim/%EC%84%9C%EB%AA%85%EB%B2%84%ED%8A%BC.png?type=w580\" alt=\"내용확인 및 서명하기 버튼\" loading=\"lazy\"/>"
@@ -519,7 +519,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 				+ "    </table>\n"
 				+ "    </div>\n"
 				+ "    <div style=\"text-align:left;margin-top:40px;margin-left:312px;\">\n"
-				+"<form target=\"_blank\" action='http://localhost:8090/user/DocumentcheckPage2' method='post'>"
+				+"<form target=\"_blank\" action='http://localhost:8091/user/DocumentcheckPage2' method='post'>"
 				+ "		<input type='hidden' name='title' value='"+article.getPapername()+"'>"
 				+ "		<input type='hidden' name='create_time' value='"+article.getCreateDate()+"'>\""
 				+ "<button><img style=\"width: 451px;height: 88px;opacity: 1;\" src=\"https://postfiles.pstatic.net/MjAyMTA1MzBfMTY5/MDAxNjIyMzA5NTkzMTUz.YPoMHSKHBEJdjIOUn3Yo1znz04iNYUWiuio63rMsyFcg.r-bEcMrY1e1YpUlrLmMWgAH35R2szk_BXgCp9OBjoFwg.PNG.minkisim/%EC%84%9C%EB%AA%85%EB%B2%84%ED%8A%BC.png?type=w580\" alt=\"내용확인 및 서명하기 버튼\" loading=\"lazy\"/>"
@@ -669,7 +669,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 			sendMail.setSubject("회원가입 이메일 인증");
 			sendMail.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
 					.append("<p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p>")
-					.append("<a href='http://localhost:8090/signUpConfirm?email=")
+					.append("<a href='http://localhost:8091/signUpConfirm?email=")
 					.append(email)
 					.append("&authKey=")
 					.append(authKey)
